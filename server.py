@@ -24,7 +24,7 @@ atexit.register(close_running_threads)
 
 # CLIENTE | PRODUTO
 
-@app.get("/fetch")
+@app.get("/cache/fetch")
 def fetch():
     
     return "<h1>ONLINE</h1>"
@@ -32,7 +32,7 @@ def fetch():
 # DATA | PRODUTO
 
 
-@app.get("/save")
+@app.get("/cache/save")
 def save():
     produto = str(request.json["produto"])
     table = produto if produto.__contains__("TABLE_") else "TABLE_%s" % produto

@@ -180,7 +180,10 @@ def fetch(produto, cliente):
     cursor.execute(
         f"SELECT table_name from information_schema.tables where table_schema = 'cache' and table_name LIKE '%{produto}%' order by table_name;")
     tabs = cursor.fetchall()
-    
+
+    if(len(tabs) == 0):
+        print("User not found")
+        return None
     #! Split tables between main and sub Tables
     mainTable = [ t[0] for t in tabs if (t[0].__contains__("SUB_") == False) ][0]
     subTables = [ t[0] for t in tabs if (t[0].__contains__("SUB_")) ]
@@ -189,7 +192,7 @@ def fetch(produto, cliente):
     result = {}
     sql = f" SELECT * FROM {mainTable} WHERE nome = '{cliente}' LIMIT 1" # MAIN SELECT
     
-    #* Execute the query and fetch the data
+    #! Execute the query and fetch the data
     dictCursor.execute(sql) 
     mainResult = dictCursor.fetchone() 
     
@@ -221,6 +224,11 @@ def fetch(produto, cliente):
 
     return result
 
+def delete():
+    cursor = db.cursor()
+    dictCursor = db.cursor(dictionary=True)
+
+
 def close():
     # Closes the DB connection
     db.close()
@@ -250,17 +258,4 @@ def close():
 #     }
 # }
 
-
-# if(search_tables("TABLE_VIVO_MOBILE") == False):
-# create_table("TABLE_VIVO_MOBILE", contents)
-
-# addTables()
-
-# else:
-#     print("Tables exist")
-
-
-# save("TABLE_VIVO_MOBILE", contents)
-
-
-# fetch(produto="VIVO_MOBILE", cliente="Marcelo Resende")
+fetch("FIBRA", "Drauzio")
