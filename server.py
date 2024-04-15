@@ -3,6 +3,8 @@ import mysql.connector
 from flask import Flask, request, jsonify, make_response, redirect
 import cache
 
+import atexit
+
 app = Flask(__name__)
 
 db = mysql.connector.connect(
@@ -12,8 +14,15 @@ db = mysql.connector.connect(
     database="vivo"
 )
 
-# CLIENTE | PRODUTO
+def close_running_threads():
+    print("Closing DB Connection...")
+    cache.close()
 
+#Register the function to be called on exit
+atexit.register(close_running_threads)
+#start your process
+
+# CLIENTE | PRODUTO
 
 @app.get("/fetch")
 def fetch():
@@ -51,7 +60,7 @@ def save():
 
     if(cache.search_tables(produto)):
         # INSERT ITEMS IN TABLE
-
+        cache.save(produto)
     else:
         # CREATE TABLES
         cache.create_table(produto, contents)
