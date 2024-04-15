@@ -26,7 +26,7 @@ atexit.register(close_running_threads)
 
 @app.get("/fetch")
 def fetch():
-
+    
     return "<h1>ONLINE</h1>"
 
 # DATA | PRODUTO
@@ -34,7 +34,10 @@ def fetch():
 
 @app.get("/save")
 def save():
-    produto = request.json["produto"]
+    produto = str(request.json["produto"])
+    table = produto if produto.__contains__("TABLE_") else "TABLE_%s" % produto
+
+    print(table)
     contents = {
         "id": 10,
         "nome": "Marcelo Resende",
@@ -58,12 +61,13 @@ def save():
         }
     }
 
-    if(cache.search_tables(produto)):
+    if(cache.search_tables(table)):
         # INSERT ITEMS IN TABLE
-        cache.save(produto)
+        cache.save(table=table, contents=contents)
     else:
         # CREATE TABLES
         cache.create_table(produto, contents)
+        cache.addTables()
 
 
 app.run(host="0.0.0.0", port=5000)
