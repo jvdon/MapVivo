@@ -1,0 +1,53 @@
+services:
+  # nginx
+  nginx:
+    image: "nginx:latest"
+    depends_on:
+      flask_app:
+        condition: service_started
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:rw
+    container_name: nginx
+    ports:
+      - "8080:8080"
+    networks:
+      - main
+  #? API Global
+  flask_app:
+    build: .
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - 5000:5000
+    networks:
+      - main
+
+  # MySQL
+  mysql:
+    image: "mysql:latest"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=vivo
+    ports:
+      - 3306:3306
+      - 33060:33060
+    networks:
+      - main
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+  #? DASHBOARD
+  # dashboard:
+  #   build: .
+  #   depends_on:
+  #     flask_app:
+  #       condition: service_started
+  #   ports:
+  #   - 3000:3000
+  #   networks:
+  #     - main
+
+networks:
+  main:
