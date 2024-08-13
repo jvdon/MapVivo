@@ -2,11 +2,12 @@ from flask import (
     Flask,
     request,
     jsonify,
-    make_response,
     redirect,
-    render_template,
     send_file,
 )
+
+from flask_swagger_ui import get_swaggerui_blueprint
+
 
 import cache
 import vivo_dns
@@ -17,23 +18,32 @@ import atexit
 
 app = Flask(__name__)
 
+SWAGGER_URL="/swagger"
+API_URL="/static/swagger.json"
 
 def close_running_threads():
     print("Closing DB Connection...")
     # cache.close()
     # utils.close()
 
-
 # Register the function to be called on exit
 atexit.register(close_running_threads)
-# start your process
 
+# start your process
+swagger_ui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': 'Access API'
+    }
+)
+app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
 # REGION DNS
 @app.get("/dns/all")
 def dns_all():
     produtos, status = vivo_dns.getAll()
-    if status is True:
+    if len(produtos) > 0:
         return jsonify(produtos), 200
     else:
         return jsonify({"error": "Nenhuma rota cadastrada"}), 404
@@ -134,12 +144,27 @@ def ping(server: str):
 
 @app.get("/api/usage")
 def checkUsage():
-    size, status = utils.getUsage()
-    ok = status == True
-    response = jsonify({"status": "Ok" if ok else "Fail", "time": size if ok else -1})
+    size, statusStorage = utils.getUsage()
+    cpu, statusCpu = utils.getCPU()
+    ram, statusRam = utils.getRAM()
+    
+    response = jsonify(
+        { 
+         "storage": {
+             "status": "Ok" if statusStorage else "Fail",
+             "value": size if statusStorage else -1
+             },
+        "ram": {
+            "status": "Ok" if statusRam else "Fail",
+            "value": ram if statusRam else -1
+        }, 
+        "cpu": {
+            "status": "Ok" if statusCpu else "Fail",
+            "value": cpu if statusCpu else -1
+        },
+    })
 
-    response.status_code == 200 if ok else 500
-    return response
+    return response, 200
 
 
 # END REGION

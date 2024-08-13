@@ -2,10 +2,11 @@ from mysql.connector import connect
 import ping3
 import cache
 
-# db = connect(host="mysql", 
-#             user="root", 
-#             password="root", 
-#             database="vivo")
+db = connect(
+    host="mysql", 
+    user="root", 
+    password="root", 
+    database="vivo")
 
 """
     CREATE TABLE produtos (
@@ -28,6 +29,21 @@ def getUsage():
         return size, True
     except:
         return -1, False
+
+def getCPU():
+    cursor = db.cursor(dictionary=True)
+    sql = "SET GLOBAL innodb_monitor_enable='cpu%'; SELECT TRUNCATE(sum(AVG_COUNT) * 100, 2) as CPU from information_schema.INNODB_METRICS WHERE name LIKE 'cpu%';"
+    cursor.execute(sql, multi=True)
+    cpu = cursor.fetchone()
+    return cpu, (cpu == "null")
+
+def getRAM():
+    cursor = db.cursor(dictionary=True)
+    sql = "SELECT FORMAT_BYTES(SUM(current_alloc)) as RAM FROM sys.x$memory_global_by_current_bytes;"
+    cursor.execute(sql)
+    ram = cursor.fetchone()
+    return ram, True
+
 
 
 def ping(server):

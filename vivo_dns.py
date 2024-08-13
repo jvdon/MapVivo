@@ -2,21 +2,11 @@ from mysql.connector import connect
 
 import utils
 
-DEBUG = True
+DEBUG = False
 if DEBUG:
     db = connect(host="localhost", user="root", password="root", database="vivo")
 else:
     db = connect(host="mysql", user="root", password="root", database="vivo")
-
-
-"""
-    CREATE TABLE produtos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome VARCHAR(255) NOT NULL,
-        address VARCHAR(255) NOT NULL,
-        ping FLOAT DEFAULT 0
-    );
-"""
 
 # MapIVivo DB
 
@@ -24,7 +14,7 @@ else:
 def getAll():
     try:
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM produtos")
+        cursor.execute("SELECT * FROM produtos ORDER BY ping ASC;")
         produtos = cursor.fetchall()
         cursor.close()
         return produtos, True
@@ -33,7 +23,7 @@ def getAll():
 
 
 def search(nome_produto: str):
-    sql = "SELECT * FROM produtos WHERE nome = %s SORT BY ping"
+    sql = "SELECT * FROM produtos WHERE nome = %s ORDER BY ping ASC;"
     try:
         cursor = db.cursor(dictionary=True)
         cursor.execute(sql, (nome_produto,))

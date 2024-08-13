@@ -1,0 +1,384 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Flask API",
+      "version": "1.0.0",
+      "description": "API documentation for Flask app"
+    },
+    "paths": {
+      "/dns/all": {
+        "get": {
+          "summary": "Retrieve all DNS records",
+          "responses": {
+            "200": {
+              "description": "Successfully retrieved all DNS records",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "No DNS records found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/dns/search/{produto}": {
+        "get": {
+          "summary": "Search for a DNS record by product",
+          "parameters": [
+            {
+              "name": "produto",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successfully retrieved DNS record",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "DNS record not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/dns/delete": {
+        "delete": {
+          "summary": "Delete a DNS record by ID",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successfully deleted DNS record",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "DNS record not found or deletion failed",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/cache/all": {
+        "get": {
+          "summary": "Retrieve all cache entries",
+          "responses": {
+            "200": {
+              "description": "Successfully retrieved all cache entries",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "No cache entries found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/cache/fetch/{produto}/{cliente}": {
+        "get": {
+          "summary": "Fetch a cache entry by product and client",
+          "parameters": [
+            {
+              "name": "produto",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "cliente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successfully fetched cache entry",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Error fetching cache entry",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/cache/save": {
+        "post": {
+          "summary": "Save a new cache entry",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cliente": {
+                      "type": "string"
+                    },
+                    "produto": {
+                      "type": "string"
+                    },
+                    "contents": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["cliente", "produto", "contents"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successfully saved cache entry",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Error saving cache entry",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/ping/{server}": {
+        "get": {
+          "summary": "Ping a server",
+          "parameters": [
+            {
+              "name": "server",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successfully pinged server",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "time": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Error pinging server",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "time": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/usage": {
+        "get": {
+          "summary": "Check API usage",
+          "responses": {
+            "200": {
+              "description": "Successfully retrieved API usage",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "time": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Error retrieving API usage",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "time": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  

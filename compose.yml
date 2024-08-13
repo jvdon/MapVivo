@@ -5,6 +5,8 @@ services:
     depends_on:
       flask_app:
         condition: service_started
+      dashboard:
+        condition: service_started
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:rw
     container_name: nginx
@@ -18,8 +20,6 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    ports:
-      - 5000:5000
     networks:
       - main
 
@@ -29,25 +29,24 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=vivo
+    volumes:
+      - "./tables.sql:/docker-entrypoint-initdb.d/1.sql"
     ports:
       - 3306:3306
-      - 33060:33060
     networks:
       - main
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 20s
       retries: 10
-  #? DASHBOARD
-  # dashboard:
-  #   build: .
-  #   depends_on:
-  #     flask_app:
-  #       condition: service_started
-  #   ports:
-  #   - 3000:3000
-  #   networks:
-  #     - main
+  #DASHBOARD
+  dashboard:
+    build: dashboard/
+    depends_on:
+      flask_app:
+        condition: service_started
+    networks:
+      - main
 
 networks:
   main:
