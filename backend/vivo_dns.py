@@ -1,12 +1,5 @@
-from mysql.connector import connect
-
 import utils
-
-DEBUG = False
-if DEBUG:
-    db = connect(host="localhost", user="root", password="root", database="vivo")
-else:
-    db = connect(host="mysql", user="root", password="root", database="vivo")
+from db import db
 
 # MapIVivo DB
 
@@ -58,7 +51,7 @@ def delete(produto_id):
 
     try:
         cursor.execute(sql, (produto_id,))
-        return "Deleted", True
+        return f"#{produto_id} Deleted", True
     except:
         return "Error deleting", False
 

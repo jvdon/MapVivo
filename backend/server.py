@@ -1,3 +1,4 @@
+# Flask
 from flask import (
     Flask,
     request,
@@ -5,39 +6,37 @@ from flask import (
     redirect,
     send_file,
 )
-
 from flask_swagger_ui import get_swaggerui_blueprint
+import atexit
 
-
+# Project
 import cache
 import vivo_dns
 import utils
 
-import atexit
-
 
 app = Flask(__name__)
 
-SWAGGER_URL="/swagger"
-API_URL="/static/swagger.json"
+SWAGGER_URL = "/swagger"
+API_URL = "/static/swagger.json"
+
 
 def close_running_threads():
     print("Closing DB Connection...")
     # cache.close()
     # utils.close()
 
+
 # Register the function to be called on exit
 atexit.register(close_running_threads)
 
 # start your process
 swagger_ui_blueprint = get_swaggerui_blueprint(
-    SWAGGER_URL,
-    API_URL,
-    config={
-        'app_name': 'Access API'
-    }
+    SWAGGER_URL, API_URL, config={"app_name": "MapVIVO"}
 )
+
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
+
 
 # REGION DNS
 @app.get("/dns/all")
@@ -56,6 +55,16 @@ def dns_search(produto: str):
         return jsonify(produto), 200
     else:
         return jsonify({"error": "Rota não encontrada"}), 404
+
+
+@app.post("/dns/add")
+def dns_add():
+    name = request.args["name"]
+    address = request.args["address"]
+
+    result, status = vivo_dns.add(name, address)
+
+    return jsonify({"message": result}), 200 if status == True else 404
 
 
 @app.delete("/dns/delete")
@@ -79,7 +88,7 @@ def cache_all():
     result, status = cache.getAll()
     print(status)
     if len(result) > 0:
-        return jsonify(result), 404
+        return jsonify(result), 200
     else:
         return jsonify({"status": "No entries in cache"}), 404
 
@@ -147,22 +156,23 @@ def checkUsage():
     size, statusStorage = utils.getUsage()
     cpu, statusCpu = utils.getCPU()
     ram, statusRam = utils.getRAM()
-    
+
     response = jsonify(
-        { 
-         "storage": {
-             "status": "Ok" if statusStorage else "Fail",
-             "value": size if statusStorage else -1
-             },
-        "ram": {
-            "status": "Ok" if statusRam else "Fail",
-            "value": ram if statusRam else -1
-        }, 
-        "cpu": {
-            "status": "Ok" if statusCpu else "Fail",
-            "value": cpu if statusCpu else -1
-        },
-    })
+        {
+            "storage": {
+                "status": "Ok" if statusStorage else "Fail",
+                "value": size if statusStorage else -1,
+            },
+            "ram": {
+                "status": "Ok" if statusRam else "Fail",
+                "value": ram if statusRam else -1,
+            },
+            "cpu": {
+                "status": "Ok" if statusCpu else "Fail",
+                "value": cpu if statusCpu else -1,
+            },
+        }
+    )
 
     return response, 200
 

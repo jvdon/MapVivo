@@ -1,4 +1,4 @@
-SET GLOBAL innodb_monitor_enable='cpu%';
+SET GLOBAL innodb_monitor_enable = 'cpu%';
 
 use vivo;
 CREATE TABLE IF NOT EXISTS produtos (

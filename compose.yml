@@ -1,5 +1,5 @@
 services:
-  # nginx
+  #! nginx
   nginx:
     image: "nginx:latest"
     depends_on:
@@ -14,23 +14,25 @@ services:
       - "8080:8080"
     networks:
       - main
-  #? API Global
+  #! API Global
   flask_app:
-    build: .
+    build: backend/
+    environment:
+      - DEBUG=true
     depends_on:
       mysql:
         condition: service_healthy
     networks:
       - main
 
-  # MySQL
+  #! MySQL
   mysql:
     image: "mysql:latest"
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=vivo
     volumes:
-      - "./tables.sql:/docker-entrypoint-initdb.d/1.sql"
+      - "./backend/tables.sql:/docker-entrypoint-initdb.d/1.sql"
     ports:
       - 3306:3306
     networks:
@@ -39,7 +41,7 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 20s
       retries: 10
-  #DASHBOARD
+  #! DASHBOARD
   dashboard:
     build: dashboard/
     depends_on:

@@ -1,0 +1,14 @@
+BASE_URL="http://localhost:5000/"
+DNS_BASE_URL="http://localhost:5000/dns/"
+DNS_ALL_URL="http://localhost:5000/dns/all"
+DNS_QUERY_URL="http://localhost:5000/dns/search"
+DNS_DELETE_URL="http://localhost:5000/dns/delete?id="
+
+CACHE_BASE_URL="http://localhost:5000/cache/"
+CACHE_ALL_URL="http://localhost:5000/cache/all"
+CACHE_FETCH_URL="http://localhost:5000/cache/fetch/<produto>/<cliente_cpf>"
+
+DASH_BASE_URL="http://localhost:5000/api/"
+DASH_PING_URL="http://localhost:5000/api/"
+DASH_USAGE_URL="http://localhost:5000/api/"
+

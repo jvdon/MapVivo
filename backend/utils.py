@@ -1,41 +1,30 @@
 from mysql.connector import connect
 import ping3
+import os
+
 import cache
-
-db = connect(
-    host="mysql", 
-    user="root", 
-    password="root", 
-    database="vivo")
-
-"""
-    CREATE TABLE produtos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome VARCHAR(255) NOT NULL,
-        address VARCHAR(255) NOT NULL,
-        ping FLOAT DEFAULT 0
-    );
-"""
+from db import db
 
 
 def getUsage():
     try:
-        # sql = "select sum((data_length+index_length)/1024) AS KB from information_schema.tables;"
-        # cursor = db.cursor()
-        # cursor.execute(sql)
-
-        # size = cursor.fetchone()
         size = cache.usage()
         return size, True
     except:
         return -1, False
 
+
 def getCPU():
     cursor = db.cursor(dictionary=True)
-    sql = "SET GLOBAL innodb_monitor_enable='cpu%'; SELECT TRUNCATE(sum(AVG_COUNT) * 100, 2) as CPU from information_schema.INNODB_METRICS WHERE name LIKE 'cpu%';"
-    cursor.execute(sql, multi=True)
+    sql = "SET GLOBAL innodb_monitor_enable='cpu%';"
+    cursor.execute(sql)
+    cursor.fetchall()
+
+    sql = "SELECT TRUNCATE(sum(AVG_COUNT) * 100, 2) as CPU from information_schema.INNODB_METRICS WHERE name LIKE 'cpu%';"
+    cursor.execute(sql)
     cpu = cursor.fetchone()
     return cpu, (cpu == "null")
+
 
 def getRAM():
     cursor = db.cursor(dictionary=True)
@@ -43,7 +32,6 @@ def getRAM():
     cursor.execute(sql)
     ram = cursor.fetchone()
     return ram, True
-
 
 
 def ping(server):

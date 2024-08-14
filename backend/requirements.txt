@@ -2,3 +2,5 @@ Flask==3.0.3
 mysql-connector-python==9.0.0
 ping3==4.0.8
 flask_swagger_ui==4.11.1
+python-dotenv==1.0.1
+

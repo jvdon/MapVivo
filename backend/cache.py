@@ -1,14 +1,13 @@
 import shelve
 import sys
 
-
 cache = shelve.open("cache/vivo")
 
 
 # Read All
 def getAll():
     try:
-        return [ {key:cache[key]} for key in cache.keys()], True
+        return [{key: cache[key]} for key in cache.keys()], True
     except:
         return "Error opening DB", False
 
@@ -66,6 +65,7 @@ def delete(cliente, produto):
         return True
     except:
         return False
-    
+
+
 def usage():
     return sys.getsizeof(cache)
