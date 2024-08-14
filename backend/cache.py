@@ -1,7 +1,7 @@
 import shelve
 import sys
 
-cache = shelve.open("cache/vivo")
+cache = shelve.open("./cache/vivo")
 
 
 # Read All

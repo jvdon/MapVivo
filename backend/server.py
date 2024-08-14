@@ -23,8 +23,7 @@ API_URL = "/static/swagger.json"
 
 def close_running_threads():
     print("Closing DB Connection...")
-    # cache.close()
-    # utils.close()
+    utils.close()
 
 
 # Register the function to be called on exit
@@ -36,7 +35,6 @@ swagger_ui_blueprint = get_swaggerui_blueprint(
 )
 
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
-
 
 # REGION DNS
 @app.get("/dns/all")

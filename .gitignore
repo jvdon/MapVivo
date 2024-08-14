@@ -155,8 +155,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-cache/
-
 *.old
 
 dashboard/node_modules

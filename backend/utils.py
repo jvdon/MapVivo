@@ -45,5 +45,5 @@ def ping(server):
         return f"Error: {e}", False
 
 
-# def close():
-#     db.close()
+def close():
+    db.close()
