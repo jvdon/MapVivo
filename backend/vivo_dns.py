@@ -1,5 +1,6 @@
 import utils
 from db import db
+from datetime import datetime
 
 # MapIVivo DB
 
@@ -29,7 +30,7 @@ def search(nome_produto: str):
 
 def add(nome, addr):
     ping, status = utils.ping(addr)
-    sql = "INSERT INTO produtos VALUES (%s, %s, %s)"
+    sql = "INSERT INTO produtos (nome, address, ping) VALUES (%s, %s, %s)"
     cursor = db.cursor()
     try:
         cursor.execute(
@@ -41,9 +42,10 @@ def add(nome, addr):
             ),
         )
         return "Microsservice added", True
-    except:
+    except Exception as e:
+        print(e)
         return "Unable to add new microsservice", False
-
+        
 
 def delete(produto_id):
     cursor = db.cursor()

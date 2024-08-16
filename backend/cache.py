@@ -15,12 +15,13 @@ def getAll():
 # Read
 def get(cliente, produto):
     index = f"{cliente}_{produto}"
+    print(index)
     try:
         if index not in cache:
             return "File Not Found", False
         else:
             return cache[index], True
-    except:
+    except Exception as e:
         return "Error opening DB", False
 
 

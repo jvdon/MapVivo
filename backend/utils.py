@@ -40,7 +40,7 @@ def ping(server):
         if response_time is not None:
             return response_time * 1000, True
         else:
-            return "No response", False
+            return -1, False
     except Exception as e:
         return f"Error: {e}", False
 

@@ -57,8 +57,8 @@ def dns_search(produto: str):
 
 @app.post("/dns/add")
 def dns_add():
-    name = request.args["name"]
-    address = request.args["address"]
+    name = request.form["name"]
+    address = request.form["address"]
 
     result, status = vivo_dns.add(name, address)
 
@@ -93,7 +93,7 @@ def cache_all():
 
 @app.get("/cache/fetch/<produto>/<cliente>")
 def fetch(produto: str, cliente: str):
-    cliente, status = cache.get(cliente=cliente.upper(), produto=produto.upper())
+    cliente, status = cache.get(cliente=cliente, produto=produto.replace(" ", "_"))
     if status == True:
         return jsonify(cliente), 200
     else:
@@ -109,7 +109,7 @@ def fetch(produto: str, cliente: str):
 @app.post("/cache/save")
 def save():
     cliente = str(request.json["cliente"]).upper()
-    produto = str(request.json["produto"]).upper()
+    produto = str(request.json["produto"]).upper().replace(" ", "_")
     contents = request.json["contents"]
 
     if cache.save(cliente, produto, contents) == True:
