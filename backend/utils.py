@@ -19,7 +19,7 @@ def getRAM():
     sql = "SELECT FORMAT_BYTES(SUM(current_alloc)) as RAM FROM sys.x$memory_global_by_current_bytes;"
     cursor.execute(sql)
     ram = cursor.fetchone()
-    return ram[0], True
+    return float(ram[0].replace("MiB", "")), True
 
 
 def ping(server):
