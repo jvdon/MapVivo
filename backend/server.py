@@ -9,6 +9,9 @@ from flask import (
 from flask_swagger_ui import get_swaggerui_blueprint
 import atexit
 
+from flask_cors import CORS, cross_origin
+
+
 # Project
 import cache
 import vivo_dns
@@ -16,6 +19,8 @@ import utils
 
 
 app = Flask(__name__)
+
+cors = CORS(app)
 
 SWAGGER_URL = "/swagger"
 API_URL = "/static/swagger.json"
@@ -36,29 +41,37 @@ swagger_ui_blueprint = get_swaggerui_blueprint(
 
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
+
 # REGION DNS
 @app.get("/dns/all")
 def dns_all():
     produtos, status = vivo_dns.getAll()
-    if len(produtos) > 0:
-        return jsonify(produtos), 200
-    else:
-        return jsonify({"error": "Nenhuma rota cadastrada"}), 404
+    ok = (len(produtos) > 0) and status
+
+    return jsonify(
+        {
+            "ok": ok,
+            "content": produtos if ok else "Nenhuma rota cadastrada",
+        }
+    ), (200 if ok else 404)
 
 
 @app.get("/dns/search/<produto>")
 def dns_search(produto: str):
-    produto, status = vivo_dns.search(produto)
-    if status is True:
-        return jsonify(produto), 200
-    else:
-        return jsonify({"error": "Rota não encontrada"}), 404
+    produto, status = vivo_dns.search(produto.upper())
+
+    return jsonify(
+        {
+            "ok": status,
+            "content": produto if status else "Rota não encontrada",
+        }
+    ), (200 if status else 404)
 
 
 @app.post("/dns/add")
 def dns_add():
-    name = request.form["name"]
-    address = request.form["address"]
+    name = str(request.json["name"]).upper()
+    address = str(request.json["address"]).lower()
 
     result, status = vivo_dns.add(name, address)
 
@@ -70,9 +83,20 @@ def dns_delete():
     index = request.args["id"]
     msg, status = vivo_dns.delete(index)
 
-    return jsonify({"status": "ok" if status is True else "Fail"}), (
-        200 if status == True else 404
-    )
+    return jsonify({"ok": status}), (200 if status == True else 404)
+
+
+@app.get("/dns/names")
+def dns_products():
+    produtos, status = vivo_dns.products()
+    ok = (len(produtos) > 0) and status
+
+    return jsonify(
+        {
+            "ok": ok,
+            "content": produtos,
+        }
+    ), (200 if ok else 404)
 
 
 # END REGION
@@ -93,12 +117,19 @@ def cache_all():
 
 @app.get("/cache/fetch/<produto>/<cliente>")
 def fetch(produto: str, cliente: str):
-    cliente, status = cache.get(cliente=cliente, produto=produto.replace(" ", "_"))
+    cliente, status = cache.get(
+        cliente=cliente.upper(), produto=produto.upper().replace(" ", "_")
+    )
     if status == True:
         return jsonify(cliente), 200
     else:
         return (
-            jsonify({"status": "Error", "message": f"Oops something went wrong"}),
+            jsonify(
+                {
+                    "status": "Error",
+                    "message": f"Oops something went wrong",
+                }
+            ),
             500,
         )
 
@@ -112,21 +143,19 @@ def save():
     produto = str(request.json["produto"]).upper().replace(" ", "_")
     contents = request.json["contents"]
 
-    if cache.save(cliente, produto, contents) == True:
-        return (
-            jsonify(
-                {
-                    "status": "Okay",
-                    "message": f"Contents added to cache with key {cliente}",
-                }
+    ok = cache.save(cliente, produto, contents)
+
+    return jsonify(
+        {
+            "ok": ok,
+            "message": (
+                f"Contents added to cache with key {cliente}"
+                if ok
+                else f"Oops something went wrong"
             ),
-            200,
-        )
-    else:
-        return (
-            jsonify({"status": "Error", "message": f"Oops something went wrong"}),
-            500,
-        )
+        },
+        200,
+    )
 
 
 # END REGION
@@ -137,14 +166,12 @@ def save():
 
 @app.get("/api/ping/<server>")
 def ping(server: str):
-    respTime, status = utils.ping(server)
-    ok = status == True
-    response = jsonify(
-        {"status": "Ok" if ok else "Fail", "time": respTime if ok else -1}
-    )
+    respTime, ok = utils.ping(server)
 
-    vivo_dns.changePing(server, respTime)
+    response = jsonify({"ok": ok, "time": respTime})
 
+    result, status = vivo_dns.changePing(server, respTime)
+    print(result, status)
     response.status_code == 200 if ok else 500
     return response
 
@@ -152,24 +179,21 @@ def ping(server: str):
 @app.get("/api/usage")
 def checkUsage():
     size, statusStorage = utils.getUsage()
-    cpu, statusCpu = utils.getCPU()
     ram, statusRam = utils.getRAM()
 
     response = jsonify(
-        {
-            "storage": {
-                "status": "Ok" if statusStorage else "Fail",
+        [
+            {
+                "name": "RAM",
+                "status": statusRam,
                 "value": size if statusStorage else -1,
             },
-            "ram": {
-                "status": "Ok" if statusRam else "Fail",
+            {
+                "name": "STORAGE",
+                "status": statusRam,
                 "value": ram if statusRam else -1,
             },
-            "cpu": {
-                "status": "Ok" if statusCpu else "Fail",
-                "value": cpu if statusCpu else -1,
-            },
-        }
+        ]
     )
 
     return response, 200

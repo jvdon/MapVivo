@@ -23,10 +23,22 @@ def search(nome_produto: str):
         cursor.execute(sql, (nome_produto,))
         produto = cursor.fetchall()
         cursor.close()
-        return produto[0], True
+        return produto, True
     except:
         return "Microsservice not found", False
 
+def products():
+    try:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT nome FROM produtos")
+        produtos = cursor.fetchall()
+        cursor.close()
+        if(len(produtos) <= 0):
+            return f"Nenhum nome cadastrado", False
+        else:
+            return produtos, True
+    except Exception as e:
+        return f"Unable to fetch names {e}", False
 
 def add(nome, addr):
     ping, status = utils.ping(addr)
@@ -43,9 +55,8 @@ def add(nome, addr):
         )
         return "Microsservice added", True
     except Exception as e:
-        print(e)
         return "Unable to add new microsservice", False
-        
+
 
 def delete(produto_id):
     cursor = db.cursor()
@@ -68,7 +79,7 @@ def check_status(nome_produto: str):
 
 
 def changeAddr(nome, addr):
-    sql = "UPDATE SET address = %s  FROM produtos WHERE nome = %s"
+    sql = "UPDATE produtos SET address = %s WHERE nome = %s"
     cursor = db.cursor()
     try:
         cursor.execute(
@@ -78,26 +89,25 @@ def changeAddr(nome, addr):
                 nome,
             ),
         )
-        return "Microsservice added", True
+        return "Microservice updated", True
     except:
-        return "Unable to add new microsservice", False
+        return "Unable to update microservice", False
 
 
 def changePing(addr, ping):
-    ping, status = utils.ping(addr)
-    sql = "UPDATE SET ping = %s  FROM produtos WHERE address = %s"
+    sql = "UPDATE produtos SET ping = %s WHERE address = %s"
     cursor = db.cursor()
     try:
         cursor.execute(
             sql,
             (
-                ping if status is True else -1,
+                ping,
                 addr,
             ),
         )
-        return "Microsservice added", True
-    except:
-        return "Unable to add new microsservice", False
+        return "Microservice updated", True
+    except Exception as e:
+        return f"Unable to update microservice {e}", False
 
 
 def close() -> None:
