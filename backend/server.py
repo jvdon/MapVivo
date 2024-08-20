@@ -20,8 +20,6 @@ import utils
 
 app = Flask(__name__)
 
-cors = CORS(app)
-
 SWAGGER_URL = "/swagger"
 API_URL = "/static/swagger.json"
 
