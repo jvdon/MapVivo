@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEBUG = True
+DEBUG = False
 
 if DEBUG:
     db = connect(host="localhost", user="root", password="root", database="vivo")
