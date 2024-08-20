@@ -1,5 +1,6 @@
 # Flask App
 FROM python:3.8-alpine
+RUN apk add gcc python3-dev musl-dev linux-headers
 # copy the requirements file into the image
 COPY ./requirements.txt /app/requirements.txt
 # switch working directory

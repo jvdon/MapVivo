@@ -1,6 +1,7 @@
 from mysql.connector import connect
 import ping3
 import os
+import psutil
 
 import cache
 from db import db
@@ -15,11 +16,9 @@ def getUsage():
 
 
 def getRAM():
-    cursor = db.cursor(dictionary=False)
-    sql = "SELECT FORMAT_BYTES(SUM(current_alloc)) as RAM FROM sys.x$memory_global_by_current_bytes;"
-    cursor.execute(sql)
-    ram = cursor.fetchone()
-    return float(ram[0].replace("MiB", "")), True
+    ram = psutil.virtual_memory()
+    print(ram.used)
+    return ram.used / (1024**3), True
 
 
 def ping(server):

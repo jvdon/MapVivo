@@ -158,3 +158,5 @@ cython_debug/
 *.old
 
 dashboard/node_modules
+
+database/

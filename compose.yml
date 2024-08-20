@@ -33,6 +33,7 @@ services:
       - MYSQL_DATABASE=vivo
     volumes:
       - "./backend/tables.sql:/docker-entrypoint-initdb.d/1.sql"
+      - ./database/:/var/lib/mysql/
     # ports:
     #   - 3306:3306
     networks:
@@ -47,6 +48,8 @@ services:
     depends_on:
       flask_app:
         condition: service_started
+    ports:
+      - 3000:3000
     networks:
       - main
 

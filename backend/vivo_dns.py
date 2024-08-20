@@ -13,7 +13,7 @@ def getAll():
         cursor.close()
         return produtos, True
     except:
-        return "Unable to fetch microsserviços", False
+        return [], False
 
 
 def search(nome_produto: str):

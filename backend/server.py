@@ -10,7 +10,7 @@ from flask_swagger_ui import get_swaggerui_blueprint
 import atexit
 
 from flask_cors import CORS, cross_origin
-
+import os
 
 # Project
 import cache
@@ -48,12 +48,7 @@ def dns_all():
     produtos, status = vivo_dns.getAll()
     ok = (len(produtos) > 0) and status
 
-    return jsonify(
-        {
-            "ok": ok,
-            "content": produtos if ok else "Nenhuma rota cadastrada",
-        }
-    ), (200 if ok else 404)
+    return jsonify(produtos), (200 if ok else 404)
 
 
 @app.get("/dns/search/<produto>")
@@ -168,7 +163,12 @@ def save():
 def ping(server: str):
     respTime, ok = utils.ping(server)
 
-    response = jsonify({"ok": ok, "time": respTime})
+    response = jsonify(
+        {
+            "server": server,
+            "time": respTime,
+        }
+    )
 
     result, status = vivo_dns.changePing(server, respTime)
     print(result, status)
@@ -182,18 +182,11 @@ def checkUsage():
     ram, statusRam = utils.getRAM()
 
     response = jsonify(
-        [
-            {
-                "name": "RAM",
-                "status": statusRam,
-                "value": size if statusStorage else -1,
-            },
-            {
-                "name": "STORAGE",
-                "status": statusRam,
-                "value": ram if statusRam else -1,
-            },
-        ]
+        {
+            "status": (statusRam and statusStorage),
+            "ram": ram if statusRam else -1,
+            "storage": size if statusStorage else -1,
+        }
     )
 
     return response, 200
@@ -201,4 +194,7 @@ def checkUsage():
 
 # END REGION
 
-app.run(host="0.0.0.0", port=5000)
+
+if __name__ == "__main__":
+    # os.environ['WERKZEUG_RUN_MAIN'] = 'true'
+    app.run(host="0.0.0.0", port=5000)
