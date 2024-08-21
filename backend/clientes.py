@@ -1,13 +1,15 @@
 import shelve
 import sys
 
-cache = shelve.open("./cache/vivo")
+clientes = shelve.open("./cache/clientes")
 
+
+# obj = 100
 
 # Read All
 def getAll():
     try:
-        return [{key: cache[key]} for key in cache.keys()], True
+        return [clientes[key] for key in clientes.keys()], True
     except:
         return "Error opening DB", False
 
@@ -17,10 +19,10 @@ def get(cliente):
     index = cliente
     print(index)
     try:
-        if index not in cache:
+        if index not in clientes:
             return "File Not Found", False
         else:
-            return cache[index], True
+            return clientes[index], True
     except Exception as e:
         return "Error opening DB", False
 
@@ -28,7 +30,7 @@ def get(cliente):
 def exists(cliente):
     index = cliente
     try:
-        return index in cache
+        return index in clientes
     except:
         return False
 
@@ -39,7 +41,7 @@ def exists(cliente):
 def save(cliente, content):
     index = cliente
     try:
-        cache[index] = content
+        clientes[index] = content
         return True
     except:
         return False
@@ -51,7 +53,7 @@ def save(cliente, content):
 def update(cliente, content):
     index = cliente
     try:
-        cache[index] = content
+        clientes[index] = content
         return True
     except:
         return False
@@ -62,11 +64,11 @@ def delete(cliente):
     index = cliente
 
     try:
-        del cache[index]
+        del clientes[index]
         return True
     except:
         return False
 
 
 def usage():
-    return sys.getsizeof(cache)
+    return sys.getsizeof(clientes)

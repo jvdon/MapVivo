@@ -10,13 +10,14 @@ from flask_swagger_ui import get_swaggerui_blueprint
 import atexit
 
 from flask_cors import CORS, cross_origin
-import os
+
+import threading
 
 # Project
 import cache
 import vivo_dns
 import utils
-
+import clientes
 
 app = Flask(__name__)
 
@@ -26,7 +27,6 @@ API_URL = "/static/swagger.json"
 
 def close_running_threads():
     print("Closing DB Connection...")
-    utils.close()
 
 
 # Register the function to be called on exit
@@ -192,7 +192,15 @@ def checkUsage():
 
 # END REGION
 
-
 if __name__ == "__main__":
     # os.environ['WERKZEUG_RUN_MAIN'] = 'true'
+    t = threading.Thread(target=utils.fetchData)
+    try:
+        """
+            I'm Happy
+        """
+        t.start()
+    except:
+        print("Ctrl+C")
+    
     app.run(host="0.0.0.0", port=5000)

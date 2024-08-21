@@ -1,15 +1,18 @@
 from mysql.connector import connect
 import ping3
-import os
 import psutil
-
+import vivo_dns as dns
 import cache
-from db import db
+import requests
+from threading import Event, Thread
+
+
+mock_url = "http://localhost:5000/users/%s/products"
 
 
 def getUsage():
     try:
-        size = cache.usage()
+        size = cache.usage() + dns.usage()
         return size, True
     except:
         return -1, False
@@ -17,8 +20,7 @@ def getUsage():
 
 def getRAM():
     ram = psutil.virtual_memory()
-    print(ram.used)
-    return ram.used / (1024**3), True
+    return ram.used / (1024**2), True
 
 
 def ping(server):
@@ -32,5 +34,6 @@ def ping(server):
         return f"Error: {e}", False
 
 
-def close():
-    db.close()
+def fetchData():
+
+    print("Fetching")

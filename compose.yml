@@ -17,31 +17,8 @@ services:
   #! API Global
   flask_app:
     build: backend/
-    environment:
-      - DEBUG=true
-    depends_on:
-      mysql:
-        condition: service_healthy
     networks:
       - main
-
-  #! MySQL
-  mysql:
-    image: "mysql:latest"
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=vivo
-    volumes:
-      - "./backend/tables.sql:/docker-entrypoint-initdb.d/1.sql"
-      - ./database/:/var/lib/mysql/
-    # ports:
-    #   - 3306:3306
-    networks:
-      - main
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      timeout: 20s
-      retries: 10
   #! DASHBOARD
   dashboard:
     build: dashboard/
