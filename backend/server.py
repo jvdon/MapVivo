@@ -133,10 +133,9 @@ def fetch(produto: str, cliente: str):
 @app.post("/cache/save")
 def save():
     cliente = str(request.json["cliente"]).upper()
-    produto = str(request.json["produto"]).upper().replace(" ", "_")
     contents = request.json["contents"]
 
-    ok = cache.save(cliente, produto, contents)
+    ok = cache.save(cliente, contents)
 
     return jsonify(
         {
@@ -193,14 +192,5 @@ def checkUsage():
 # END REGION
 
 if __name__ == "__main__":
-    # os.environ['WERKZEUG_RUN_MAIN'] = 'true'
-    t = threading.Thread(target=utils.fetchData)
-    try:
-        """
-            I'm Happy
-        """
-        t.start()
-    except:
-        print("Ctrl+C")
-    
+    # os.environ['WERKZEUG_RUN_MAIN'] = 'true'    
     app.run(host="0.0.0.0", port=5000)

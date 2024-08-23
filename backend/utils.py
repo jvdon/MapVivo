@@ -1,14 +1,7 @@
-from mysql.connector import connect
 import ping3
 import psutil
 import vivo_dns as dns
 import cache
-import requests
-from threading import Event, Thread
-
-
-mock_url = "http://localhost:5000/users/%s/products"
-
 
 def getUsage():
     try:
@@ -32,8 +25,3 @@ def ping(server):
             return 1000, False
     except Exception as e:
         return f"Error: {e}", False
-
-
-def fetchData():
-
-    print("Fetching")

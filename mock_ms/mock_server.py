@@ -52,10 +52,8 @@ def list_user_products(user_id):
             400,
         )
 
-    
     return jsonify([generate_product(), generate_product()])
-    
-    
+
 
 # Error responses
 @app.errorhandler(404)
