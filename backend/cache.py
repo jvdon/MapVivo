@@ -8,8 +8,8 @@ cache = shelve.open("./cache/vivo")
 def getAll():
     try:
         return [{key: cache[key]} for key in cache.keys()], True
-    except:
-        return "Error opening DB", False
+    except Exception as e:
+        return [], False
 
 
 # Read

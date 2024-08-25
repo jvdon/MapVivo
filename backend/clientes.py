@@ -1,33 +1,40 @@
 import shelve
 import sys
 
-clientes = shelve.open("./cache/clientes")
+clientes = shelve.open("./db/clientes")
 
 
-# obj = 100
+"""obj = {
+    user_id: number,
+    in_cache: bool,
+    last_seen: date
+}
+"""
+
 
 # Read All
 def getAll():
     try:
         return [clientes[key] for key in clientes.keys()], True
     except:
-        return "Error opening DB", False
+        return [], False
 
 
 # Read
-def get(cliente):
+def get(cliente:str):
     index = cliente
     print(index)
     try:
         if index not in clientes:
-            return "File Not Found", False
+            return "Client Not Found", False
         else:
             return clientes[index], True
     except Exception as e:
         return "Error opening DB", False
 
+
 # Check Exists
-def exists(cliente):
+def exists(cliente:str):
     index = cliente
     try:
         return index in clientes
@@ -38,22 +45,25 @@ def exists(cliente):
 # Write
 
 
-def save(cliente, content):
+def save(cliente:str, content):
     index = cliente
     try:
         clientes[index] = content
         return True
-    except:
+    except Exception as e:
+        print(e)
         return False
 
 
 # Update
 
 
-def update(cliente, content):
-    index = cliente
+def update(user_id:str, content):
     try:
-        clientes[index] = content
+        old = dict(clientes[user_id])
+        old.update(content)
+
+        clientes[user_id] = old
         return True
     except:
         return False

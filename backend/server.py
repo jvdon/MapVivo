@@ -3,15 +3,11 @@ from flask import (
     Flask,
     request,
     jsonify,
-    redirect,
-    send_file,
 )
 from flask_swagger_ui import get_swaggerui_blueprint
 import atexit
 
-from flask_cors import CORS, cross_origin
-
-import threading
+from datetime import datetime
 
 # Project
 import cache
@@ -153,9 +149,71 @@ def save():
 # END REGION
 
 
+# REGION Clientes
+@app.get("/client/all")
+def clientes_all():
+    clients, ok = clientes.getAll()
+    return {
+        "ok": ok,
+        "contents": clients,
+    }, (200 if ok else 404)
+
+
+@app.post("/client/add")
+def clientes_add():
+    user_id = str(request.json["user_id"])
+    in_cache = False
+    last_seen = datetime.now()
+
+    ok = clientes.save(
+        user_id,
+        {
+            "user_id": user_id,
+            "in_cache": in_cache,
+            "last_seen": last_seen.strftime("%d/%m/%Y"),
+        },
+    )
+
+    return jsonify(
+        {
+            "ok": ok,
+            "message": (
+                "Cliente adicionado" if ok else "Não foi possível adicionar o cliente"
+            ),
+        }
+    ), (200 if ok else 400)
+
+
+@app.delete("/client/delete")
+def cliente_delete():
+    user_id = str(request.args["user_id"])
+    ok = clientes.delete(user_id)
+    return f"{user_id} Deleted" if ok else "Unable to delete", 200 if ok else 400
+
+
+@app.put("/client/update")
+def cliente_update():
+    user_id = str(request.json["user_id"])
+    contents = dict(request.json["contents"])
+
+    contents.update({"user_id": user_id})
+
+    ok = clientes.update(user_id, contents)
+
+    return "Updated" if ok else "Unable to update", 200 if ok else 400
+
+
+@app.get("/client/search")
+def client_search():
+    user_id = str(request.args["user_id"])
+    result, ok = clientes.get(user_id)
+    return jsonify({"ok": ok, "message": result}), 200 if ok else 404
+
+
+# END REGION
+
+
 # REGION DASHBOARD (API)
-
-
 @app.get("/api/ping/<server>")
 def ping(server: str):
     respTime, ok = utils.ping(server)
@@ -192,5 +250,4 @@ def checkUsage():
 # END REGION
 
 if __name__ == "__main__":
-    # os.environ['WERKZEUG_RUN_MAIN'] = 'true'    
     app.run(host="0.0.0.0", port=5000)

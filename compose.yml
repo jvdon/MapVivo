@@ -19,6 +19,18 @@ services:
     build: backend/
     networks:
       - main
+  connector:
+    image: "jobber:lastest"
+    build: connector/
+    networks:
+      - main
+    volumes:
+      - ./connector/.jobber:/home/jobberuser/.jobber
+    
+  mock:
+    build: mock_ms/
+    networks:
+      - main
   #! DASHBOARD
   dashboard:
     build: dashboard/

@@ -5,7 +5,7 @@ import sys
 
 # MapIVivo DB
 
-dns = shelve.open("./cache/dns")
+dns = shelve.open("./db/dns")
 
 def getAll():
     try:

@@ -8,7 +8,7 @@ faker = Faker()
 
 
 # Helper function to generate random product data
-def generate_product():
+def generate_product(user_id):
     product_types = [
         "mobile",
         "landline",
@@ -21,7 +21,7 @@ def generate_product():
     subscription_types = ["prepaid", "postpaid", "control"]
 
     return {
-        "id": faker.uuid4(),
+        "id": user_id,
         "product_name": faker.word(),
         "product_type": random.choice(product_types),
         "status": random.choice(status_types),
@@ -29,7 +29,9 @@ def generate_product():
         "subscription_type": random.choice(subscription_types),
         "identifiers": [faker.phone_number()],
         "descriptions": [{"text": faker.sentence()}],
-        "sub_products": [generate_product()] if random.choice([True, False]) else [],
+        "sub_products": (
+            [generate_product(user_id)] if random.choice([True, False]) else []
+        ),
     }
 
 
@@ -52,7 +54,7 @@ def list_user_products(user_id):
             400,
         )
 
-    return jsonify([generate_product(), generate_product()])
+    return jsonify([generate_product(user_id), generate_product(user_id)])
 
 
 # Error responses
@@ -88,4 +90,4 @@ def timeout(e):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5100)
+    app.run(host="0.0.0.0", debug=True, port=5100)

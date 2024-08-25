@@ -1,0 +1,7 @@
+jobs:
+  DailyBackup:
+    cmd: /usr/local/bin/backup /home/bob/documents
+    time: * "*/10" * * * *
+    onError: Stop
+    notifyOnFailure:
+      - *systemEmailSink
