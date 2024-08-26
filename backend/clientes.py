@@ -11,6 +11,13 @@ clientes = shelve.open("./db/clientes")
 }
 """
 
+def open_cache(file_path):
+    try:
+        return shelve.open(file_path, writeback=True)
+    except Exception as e:
+        print(f"Error opening shelve file: {e}")
+        return None
+
 
 # Read All
 def getAll():

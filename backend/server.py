@@ -9,19 +9,25 @@ import atexit
 
 from datetime import datetime
 
+
 # Project
 import cache
 import vivo_dns
 import utils
 import clientes
 
+import threading
+
 app = Flask(__name__)
 
 SWAGGER_URL = "/swagger"
 API_URL = "/static/swagger.json"
 
+thread_lock = threading.Lock()
+
 
 def close_running_threads():
+
     print("Closing DB Connection...")
 
 
@@ -34,6 +40,12 @@ swagger_ui_blueprint = get_swaggerui_blueprint(
 )
 
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
+
+# if cache.checkCache() and vivo_dns.checkCache() and clientes.checkCache():
+#     print("Databases are okay... Proceeding")
+# else:
+#     print("Unable to load all databases... Exiting")
+#     exit(-1)
 
 
 # REGION DNS
@@ -96,7 +108,8 @@ def dns_products():
 
 @app.get("/cache/all")
 def cache_all():
-    result, status = cache.getAll()
+    with thread_lock:
+        result, status = cache.getAll()
     print(status)
     if len(result) > 0:
         return jsonify(result), 200
@@ -130,8 +143,8 @@ def fetch(produto: str, cliente: str):
 def save():
     cliente = str(request.json["cliente"]).upper()
     contents = request.json["contents"]
-
-    ok = cache.save(cliente, contents)
+    with thread_lock:
+        ok = cache.save(cliente, contents)
 
     return jsonify(
         {
@@ -146,13 +159,23 @@ def save():
     )
 
 
+@app.delete("/cache/delete")
+def delete_cache():
+    user_id = str(request.args["user_id"])
+
+    with thread_lock:
+        ok = cache.delete(user_id)
+    return f"{user_id} Deleted" if ok else "Unable to delete", 200 if ok else 400
+
+
 # END REGION
 
 
 # REGION Clientes
 @app.get("/client/all")
 def clientes_all():
-    clients, ok = clientes.getAll()
+    with thread_lock:
+        clients, ok = clientes.getAll()
     return {
         "ok": ok,
         "contents": clients,
@@ -165,14 +188,15 @@ def clientes_add():
     in_cache = False
     last_seen = datetime.now()
 
-    ok = clientes.save(
-        user_id,
-        {
-            "user_id": user_id,
-            "in_cache": in_cache,
-            "last_seen": last_seen.strftime("%d/%m/%Y"),
-        },
-    )
+    with thread_lock:
+        ok = clientes.save(
+            user_id,
+            {
+                "user_id": user_id,
+                "in_cache": in_cache,
+                "last_seen": last_seen.strftime("%d/%m/%Y"),
+            },
+        )
 
     return jsonify(
         {
@@ -187,7 +211,8 @@ def clientes_add():
 @app.delete("/client/delete")
 def cliente_delete():
     user_id = str(request.args["user_id"])
-    ok = clientes.delete(user_id)
+    with thread_lock:
+        ok = clientes.delete(user_id)
     return f"{user_id} Deleted" if ok else "Unable to delete", 200 if ok else 400
 
 
@@ -198,7 +223,8 @@ def cliente_update():
 
     contents.update({"user_id": user_id})
 
-    ok = clientes.update(user_id, contents)
+    with thread_lock:
+        ok = clientes.update(user_id, contents)
 
     return "Updated" if ok else "Unable to update", 200 if ok else 400
 
@@ -206,7 +232,8 @@ def cliente_update():
 @app.get("/client/search")
 def client_search():
     user_id = str(request.args["user_id"])
-    result, ok = clientes.get(user_id)
+    with thread_lock:
+        result, ok = clientes.get(user_id)
     return jsonify({"ok": ok, "message": result}), 200 if ok else 404
 
 
@@ -216,7 +243,8 @@ def client_search():
 # REGION DASHBOARD (API)
 @app.get("/api/ping/<server>")
 def ping(server: str):
-    respTime, ok = utils.ping(server)
+    with thread_lock:
+        respTime, ok = utils.ping(server)
 
     response = jsonify(
         {
@@ -225,7 +253,8 @@ def ping(server: str):
         }
     )
 
-    result, status = vivo_dns.changePing(server, respTime)
+    with thread_lock:
+        result, status = vivo_dns.changePing(server, respTime)
     print(result, status)
     response.status_code == 200 if ok else 500
     return response
@@ -234,7 +263,8 @@ def ping(server: str):
 @app.get("/api/usage")
 def checkUsage():
     size, statusStorage = utils.getUsage()
-    ram, statusRam = utils.getRAM()
+    with thread_lock:
+        ram, statusRam = utils.getRAM()
 
     response = jsonify(
         {
@@ -250,4 +280,4 @@ def checkUsage():
 # END REGION
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, threaded=True)

@@ -5,9 +5,22 @@ import sys
 
 # MapIVivo DB
 
-dns = shelve.open("./db/dns")
+
+def open_cache(file_path):
+    try:
+        return shelve.open(file_path, writeback=True)
+    except Exception as e:
+        print(f"Error opening shelve file: {e}")
+        return None
+
+
+# Check cache access
+def checkCache():
+    return open_cache("./db/dns") != None
+
 
 def getAll():
+    dns = open_cache("./db/dns")
     try:
         return [dns[key] for key in dns.keys()], True
     except:
@@ -15,7 +28,7 @@ def getAll():
 
 
 def search(nome_produto: str):
-
+    dns = open_cache("./db/dns")
     try:
         dnss = list(dns[nome_produto])
         dnss.sort()
@@ -25,6 +38,7 @@ def search(nome_produto: str):
 
 
 def products():
+    dns = open_cache("./db/dns")
     try:
         return [{key: dns[key]["nome"]} for key in dns.keys()], True
     except:
@@ -33,6 +47,7 @@ def products():
 
 def add(nome, addr):
     ping, status = utils.ping(addr)
+    dns = open_cache("./db/dns")
 
     try:
         time = datetime.now()
@@ -48,13 +63,16 @@ def add(nome, addr):
 
 
 def delete(addr):
+    dns = open_cache("./db/dns")
     try:
         del dns[addr]
         return f"#{addr} Deleted", True
     except:
         return "Error deleting", False
 
+
 def changePing(addr, ping):
+    dns = open_cache("./db/dns")
     try:
         dns[addr]["ping"] = ping
         return "Microservice updated", True
@@ -63,7 +81,9 @@ def changePing(addr, ping):
 
 
 def close() -> None:
+    dns = open_cache("./db/dns")
     dns.close()
+
 
 def usage():
     return sys.getsizeof(dns)
