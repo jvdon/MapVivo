@@ -1,2 +1,0 @@
-*/1 * * * * python /connector.py
-0 2 * * 0 python /cleanup.py

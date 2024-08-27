@@ -41,13 +41,6 @@ swagger_ui_blueprint = get_swaggerui_blueprint(
 
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
-# if cache.checkCache() and vivo_dns.checkCache() and clientes.checkCache():
-#     print("Databases are okay... Proceeding")
-# else:
-#     print("Unable to load all databases... Exiting")
-#     exit(-1)
-
-
 # REGION DNS
 @app.get("/dns/all")
 def dns_all():
@@ -119,9 +112,11 @@ def cache_all():
 
 @app.get("/cache/fetch/<produto>/<cliente>")
 def fetch(produto: str, cliente: str):
-    cliente, status = cache.get(
-        cliente=cliente.upper(), produto=produto.upper().replace(" ", "_")
-    )
+    with thread_lock:
+        cliente, status = cache.get(
+            cliente=cliente.upper(), 
+            produto=produto.upper().replace(" ", "_")
+        )
     if status == True:
         return jsonify(cliente), 200
     else:
@@ -155,7 +150,7 @@ def save():
                 else f"Oops something went wrong"
             ),
         },
-        200,
+        200 if ok else 500,
     )
 
 

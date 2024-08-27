@@ -63,24 +63,18 @@ def process_client(client):
     if len(products) > 0:
         saveData(user_id, products)
 
+def main():
+    print(f"[{datetime.now().strftime(format)}] Starting connector...")
 
-print(f"[{datetime.now().strftime(format)}] Starting connector...")
+    clients = fetchUsers()
+    print(f"[{datetime.now().strftime(format)}] Got {len(clients)} users")
 
-clients = fetchUsers()
-print(f"[{datetime.now().strftime(format)}] Got {len(clients)} users")
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        futures = [executor.submit(process_client, client) for client in clients]
 
-with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-    futures = [executor.submit(process_client, client) for client in clients]
-
-    # Optionally, wait for all futures to complete
-    for future in concurrent.futures.as_completed(futures):
-        try:
-            future.result()  # Fetch result to catch exceptions
-        except Exception as e:
-            print(f"An error occurred: {e}")
-
-# for client in clients:
-#     user_id = client["user_id"]
-#     products = fetchProducts(user_id)
-#     if len(products) > 0:
-#         saveData(user_id, products)
+        # Optionally, wait for all futures to complete
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                future.result()  # Fetch result to catch exceptions
+            except Exception as e:
+                print(f"An error occurred: {e}")

@@ -26,8 +26,6 @@ services:
         condition: service_started
     networks:
       - main
-    volumes:
-      - ./connector/.jobber:/home/jobberuser/.jobber
 
   mock:
     build: mock_ms/

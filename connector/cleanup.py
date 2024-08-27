@@ -2,7 +2,6 @@ from datetime import datetime
 import requests
 import concurrent.futures
 
-
 curr = datetime.now().date()
 
 back_url = "http://flask_app:5000"
@@ -66,22 +65,23 @@ def process_client(client):
         )
 
 
-print(f"[{datetime.now().strftime(format)}] Starting cleanup...")
+def main():
+    print(f"[{datetime.now().strftime(format)}] Starting cleanup...")
 
-clients = fetchUsers()
-print(f"[{datetime.now().strftime(format)}] Got {len(clients)} users")
+    clients = fetchUsers()
+    print(f"[{datetime.now().strftime(format)}] Got {len(clients)} users")
 
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        futures = [executor.submit(process_client, client) for client in clients]
 
-with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-    futures = [executor.submit(process_client, client) for client in clients]
+        # Optionally, wait for all futures to complete
+        for future in concurrent.futures.as_completed(futures):
+            # Handle exceptions if any
+            try:
+                future.result()
+            except Exception as e:
+                print(f"An error occurred: {e}")
 
-    # Optionally, wait for all futures to complete
-    for future in concurrent.futures.as_completed(futures):
-        # Handle exceptions if any
-        try:
-            future.result()
-        except Exception as e:
-            print(f"An error occurred: {e}")
 
 # for client in clients:
 #     user_id = client["user_id"]
