@@ -110,7 +110,7 @@ def cache_all():
         return jsonify({"status": "No entries in cache"}), 404
 
 
-@app.get("/cache/fetch/<produto>/<cliente>")
+@app.get("/cache/fetch/<cliente>")
 def fetch(produto: str, cliente: str):
     with thread_lock:
         cliente, status = cache.get(

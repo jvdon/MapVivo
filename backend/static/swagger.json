@@ -1,376 +1,570 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-      "title": "MapVIVO",
-      "version": "1.0.0",
-      "description": "API documentation for MapVIVO"
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Flask API",
+    "version": "1.0.0",
+    "description": "API documentation for the Flask application"
+  },
+  "paths": {
+    "/dns/all": {
+      "get": {
+        "summary": "Get all DNS records",
+        "responses": {
+          "200": {
+            "description": "Successful response with DNS records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No DNS records found"
+          }
+        }
+      }
     },
-    "paths": {
-      "/dns/all": {
-        "get": {
-          "summary": "Retrieve all DNS records",
-          "responses": {
-            "200": {
-              "description": "Successfully retrieved all DNS records",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "type": "object"
-                    }
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "No DNS records found",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "error": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/dns/search/{produto}": {
-        "get": {
-          "summary": "Search for a DNS record by product",
-          "parameters": [
-            {
-              "name": "produto",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successfully retrieved DNS record",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "DNS record not found",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "error": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/dns/delete": {
-        "delete": {
-          "summary": "Delete a DNS record by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "query",
-              "required": true,
-              "schema": {
-                "type": "integer"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successfully deleted DNS record",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "status": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "DNS record not found or deletion failed",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "status": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/cache/all": {
-        "get": {
-          "summary": "Retrieve all cache entries",
-          "responses": {
-            "200": {
-              "description": "Successfully retrieved all cache entries",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "type": "object"
-                    }
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "No cache entries found",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "status": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/cache/fetch/{produto}/{cliente}": {
-        "get": {
-          "summary": "Fetch a cache entry by product and client",
-          "parameters": [
-            {
-              "name": "produto",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "cliente",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successfully fetched cache entry",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Error fetching cache entry",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "status": {
-                        "type": "string"
-                      },
-                      "message": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/cache/save": {
-        "post": {
-          "summary": "Save a new cache entry",
-          "requestBody": {
+    "/dns/search/{produto}": {
+      "get": {
+        "summary": "Search DNS record by product name",
+        "parameters": [
+          {
+            "name": "produto",
+            "in": "path",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with DNS record",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "cliente": {
-                      "type": "string"
+                    "ok": {
+                      "type": "boolean"
                     },
-                    "produto": {
-                      "type": "string"
-                    },
-                    "contents": {
+                    "content": {
                       "type": "string"
                     }
-                  },
-                  "required": ["cliente", "produto", "contents"]
+                  }
                 }
               }
             }
           },
-          "responses": {
-            "200": {
-              "description": "Successfully saved cache entry",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "status": {
-                        "type": "string"
-                      },
-                      "message": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Error saving cache entry",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "status": {
-                        "type": "string"
-                      },
-                      "message": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
+          "404": {
+            "description": "DNS record not found"
           }
         }
-      },
-      "/api/ping/{server}": {
-        "get": {
-          "summary": "Ping a server",
-          "parameters": [
-            {
-              "name": "server",
-              "in": "path",
-              "required": true,
+      }
+    },
+    "/dns/add": {
+      "post": {
+        "summary": "Add a new DNS record",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
               "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successfully pinged server",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "status": {
-                        "type": "string"
-                      },
-                      "time": {
-                        "type": "integer"
-                      }
-                    }
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
                   }
-                }
-              }
-            },
-            "500": {
-              "description": "Error pinging server",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "status": {
-                        "type": "string"
-                      },
-                      "time": {
-                        "type": "integer"
-                      }
-                    }
-                  }
-                }
+                },
+                "required": [
+                  "name",
+                  "address"
+                ]
               }
             }
           }
+        },
+        "responses": {
+          "200": {
+            "description": "DNS record added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Failed to add DNS record"
+          }
         }
-      },
-      "/api/usage": {
-        "get": {
-          "summary": "Check API usage",
-          "responses": {
-            "200": {
-              "description": "Successfully retrieved API usage",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "status": {
+      }
+    },
+    "/dns/delete": {
+      "delete": {
+        "summary": "Delete a DNS record",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "DNS record deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Failed to delete DNS record"
+          }
+        }
+      }
+    },
+    "/dns/names": {
+      "get": {
+        "summary": "Get all DNS names",
+        "responses": {
+          "200": {
+            "description": "Successful response with DNS names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "content": {
+                      "type": "array",
+                      "items": {
                         "type": "string"
-                      },
-                      "time": {
-                        "type": "integer"
                       }
                     }
                   }
                 }
               }
-            },
-            "500": {
-              "description": "Error retrieving API usage",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "status": {
-                        "type": "string"
-                      },
-                      "time": {
-                        "type": "integer"
+            }
+          },
+          "404": {
+            "description": "No DNS names found"
+          }
+        }
+      }
+    },
+    "/cache/all": {
+      "get": {
+        "summary": "Get all cache entries",
+        "responses": {
+          "200": {
+            "description": "Successful response with cache entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No cache entries found"
+          }
+        }
+      }
+    },
+    "/cache/fetch/{produto}/{cliente}": {
+      "get": {
+        "summary": "Fetch cache entry by product and client",
+        "parameters": [
+          {
+            "name": "produto",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cliente",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with cache entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error occurred while fetching cache entry"
+          }
+        }
+      }
+    },
+    "/cache/save": {
+      "post": {
+        "summary": "Save a cache entry",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cliente": {
+                    "type": "string"
+                  },
+                  "contents": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "cliente",
+                  "contents"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cache entry saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to save cache entry"
+          }
+        }
+      }
+    },
+    "/cache/delete": {
+      "delete": {
+        "summary": "Delete a cache entry",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cache entry deleted successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to delete cache entry"
+          }
+        }
+      }
+    },
+    "/client/all": {
+      "get": {
+        "summary": "Get all clients",
+        "responses": {
+          "200": {
+            "description": "Successful response with clients",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "contents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No clients found"
+          }
+        }
+      }
+    },
+    "/client/add": {
+      "post": {
+        "summary": "Add a new client",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "user_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Client added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to add client"
+          }
+        }
+      }
+    },
+    "/client/delete": {
+      "delete": {
+        "summary": "Delete a client",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client deleted successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to delete client"
+          }
+        }
+      }
+    },
+    "/client/update": {
+      "put": {
+        "summary": "Update a client",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "contents": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "user_id",
+                  "contents"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Client updated successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to update client"
+          }
+        }
+      }
+    },
+    "/client/search": {
+      "get": {
+        "summary": "Search for a client by user ID",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with client data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Client not found"
+          }
+        }
+      }
+    },
+    "/api/ping/{server}": {
+      "get": {
+        "summary": "Ping a server",
+        "parameters": [
+          {
+            "name": "server",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful ping response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "server": {
+                      "type": "string"
+                    },
+                    "time": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error occurred during ping"
+          }
+        }
+      }
+    },
+    "/api/usage": {
+      "get": {
+        "summary": "Get system usage statistics",
+        "responses": {
+          "200": {
+            "description": "Successful response with system usage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "ram": {
+                      "type": "number"
+                    },
+                    "storage": {
+                      "type": "number"
                     }
                   }
                 }
@@ -381,4 +575,4 @@
       }
     }
   }
-  
+}
