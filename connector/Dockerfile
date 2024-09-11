@@ -2,6 +2,14 @@
 FROM python:3.8-alpine
 # copy the requirements file into the image
 COPY ./requirements.txt /app/requirements.txt
+# Install build dependencies
+RUN apk update && \
+    apk add --no-cache \
+    gcc \
+    g++ \
+    make \
+    python3-dev \
+    musl-dev
 # switch working directory
 WORKDIR /app
 # install the dependencies and packages in the requirements file

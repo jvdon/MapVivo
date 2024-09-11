@@ -12,6 +12,7 @@ def cleanup():
 
     cleanup.main()
 
+
 @sched.scheduled_job(trigger=IntervalTrigger(seconds=30))
 def connect():
     import populate
@@ -22,6 +23,7 @@ def connect():
 def shutdown_scheduler(signum, frame):
     print("Shutting down scheduler...")
     sched.shutdown()
+
 
 connect()
 

@@ -10,7 +10,7 @@ format = "%d/%m/%Y"
 
 
 def fetchUsers():
-    url = f"{back_url}/client/all"
+    url = f"{back_url}/updatable/all"
     try:
         r = requests.get(url)
         if r.status_code == 200:
@@ -24,7 +24,7 @@ def fetchUsers():
 
 
 def deleteClient(id):
-    url = f"{back_url}/client/delete?user_id={id}"
+    url = f"{back_url}/updatable/delete?user_id={id}"
 
     try:
         r = requests.delete(url)
@@ -81,12 +81,3 @@ def main():
                 future.result()
             except Exception as e:
                 print(f"An error occurred: {e}")
-
-
-# for client in clients:
-#     user_id = client["user_id"]
-#     last_seen = client["last_seen"]
-#     covn = datetime.strptime(last_seen, format).date()
-#     if curr >= covn:
-#         print("Passou")
-#         ok = deleteClient(user_id)

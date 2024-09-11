@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 from faker import Faker
 import random
-from datetime import datetime, timedelta
 
 app = Flask(__name__)
 faker = Faker()
@@ -54,14 +53,19 @@ def list_user_products(user_id):
             400,
         )
 
-    return jsonify([generate_product(user_id), generate_product(user_id)])
+    return jsonify(generate_product(user_id))
 
 
 # Error responses
 @app.errorhandler(404)
 def not_found(e):
     return (
-        jsonify({"code": "NOT_FOUND", "message": "A specified resource is not found"}),
+        jsonify(
+            {
+                "code": "NOT_FOUND",
+                "message": "A specified resource is not found",
+            }
+        ),
         404,
     )
 
@@ -83,7 +87,10 @@ def forbidden(e):
 def timeout(e):
     return (
         jsonify(
-            {"code": "TIMEOUT", "message": "Request timeout exceeded. Try it later"}
+            {
+                "code": "TIMEOUT",
+                "message": "Request timeout exceeded. Try it later",
+            }
         ),
         504,
     )

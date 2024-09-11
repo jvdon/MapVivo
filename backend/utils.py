@@ -3,6 +3,7 @@ import psutil
 import vivo_dns as dns
 import cache
 
+
 def getUsage():
     try:
         size = cache.usage() + dns.usage()

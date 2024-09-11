@@ -9,12 +9,13 @@ import atexit
 
 from datetime import datetime
 
+# importa bibliotecas do cassandra
 
 # Project
 import cache
 import vivo_dns
 import utils
-import clientes
+import updatable
 
 import threading
 
@@ -24,6 +25,9 @@ SWAGGER_URL = "/swagger"
 API_URL = "/static/swagger.json"
 
 thread_lock = threading.Lock()
+
+# updatable.open_cache()
+# cache.open_cache()
 
 
 def close_running_threads():
@@ -40,6 +44,7 @@ swagger_ui_blueprint = get_swaggerui_blueprint(
 )
 
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
+
 
 # REGION DNS
 @app.get("/dns/all")
@@ -110,13 +115,14 @@ def cache_all():
         return jsonify({"status": "No entries in cache"}), 404
 
 
-@app.get("/cache/fetch/<cliente>")
-def fetch(produto: str, cliente: str):
+@app.get("/users/<user_id>/products")
+def fetch(user_id: str):
     with thread_lock:
+        print(user_id)
         cliente, status = cache.get(
-            cliente=cliente.upper(), 
-            produto=produto.upper().replace(" ", "_")
+            cliente=user_id.upper(),
         )
+    print(cliente)
     if status == True:
         return jsonify(cliente), 200
     else:
@@ -136,20 +142,21 @@ def fetch(produto: str, cliente: str):
 
 @app.post("/cache/save")
 def save():
-    cliente = str(request.json["cliente"]).upper()
     contents = request.json["contents"]
     with thread_lock:
-        ok = cache.save(cliente, contents)
+        index, ok = cache.save(contents)
 
-    return jsonify(
-        {
-            "ok": ok,
-            "message": (
-                f"Contents added to cache with key {cliente}"
-                if ok
-                else f"Oops something went wrong"
-            ),
-        },
+    return (
+        jsonify(
+            {
+                "ok": ok,
+                "message": (
+                    f"Contents added to cache with key {index}"
+                    if ok
+                    else f"Oops something went wrong"
+                ),
+            }
+        ),
         200 if ok else 500,
     )
 
@@ -167,25 +174,24 @@ def delete_cache():
 
 
 # REGION Clientes
-@app.get("/client/all")
+@app.get("/updatable/all")
 def clientes_all():
     with thread_lock:
-        clients, ok = clientes.getAll()
+        clients, ok = updatable.getAll()
     return {
         "ok": ok,
         "contents": clients,
     }, (200 if ok else 404)
 
 
-@app.post("/client/add")
+@app.post("/updatable/add")
 def clientes_add():
     user_id = str(request.json["user_id"])
     in_cache = False
     last_seen = datetime.now()
 
     with thread_lock:
-        ok = clientes.save(
-            user_id,
+        ok = updatable.save(
             {
                 "user_id": user_id,
                 "in_cache": in_cache,
@@ -203,15 +209,15 @@ def clientes_add():
     ), (200 if ok else 400)
 
 
-@app.delete("/client/delete")
+@app.delete("/updatable/delete")
 def cliente_delete():
     user_id = str(request.args["user_id"])
     with thread_lock:
-        ok = clientes.delete(user_id)
+        ok = updatable.delete(user_id)
     return f"{user_id} Deleted" if ok else "Unable to delete", 200 if ok else 400
 
 
-@app.put("/client/update")
+@app.put("/updatable/update")
 def cliente_update():
     user_id = str(request.json["user_id"])
     contents = dict(request.json["contents"])
@@ -219,16 +225,16 @@ def cliente_update():
     contents.update({"user_id": user_id})
 
     with thread_lock:
-        ok = clientes.update(user_id, contents)
+        ok = updatable.update(user_id, contents)
 
     return "Updated" if ok else "Unable to update", 200 if ok else 400
 
 
-@app.get("/client/search")
+@app.get("/updatable/search")
 def client_search():
     user_id = str(request.args["user_id"])
     with thread_lock:
-        result, ok = clientes.get(user_id)
+        result, ok = updatable.get(user_id)
     return jsonify({"ok": ok, "message": result}), 200 if ok else 404
 
 
@@ -257,8 +263,8 @@ def ping(server: str):
 
 @app.get("/api/usage")
 def checkUsage():
-    size, statusStorage = utils.getUsage()
     with thread_lock:
+        size, statusStorage = utils.getUsage()
         ram, statusRam = utils.getRAM()
 
     response = jsonify(

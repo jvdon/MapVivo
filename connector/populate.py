@@ -3,17 +3,19 @@ from faker import Faker
 from datetime import datetime as datetime
 import concurrent.futures
 
-mock_url = "http://flask_app:5100/users/%s/products"
-back_url = "http://mock:5000"
+mock_url = "http://localhost:5100/users/%s/products"
+back_url = "http://localhost:5000"
 faker = Faker()
-format = '%d/%m/%Y %H:%M:%S'
+format = "%d/%m/%Y %H:%M:%S"
+
 
 def fetchUsers():
-    url = f"{back_url}/client/all"
+    url = f"{back_url}/updatable/all"
     try:
         r = requests.get(url)
         if r.status_code == 200:
             body = r.json()
+            print(body)
             clients = body["contents"]
             return clients
         else:
@@ -33,8 +35,8 @@ def fetchProducts(id):
 
 def saveData(id, content):
     url = f"{back_url}/cache/save"
-    update_url = f"{back_url}/client/update"
-    payload = {"cliente": id, "contents": content}
+    update_url = f"{back_url}/updatable/update"
+    payload = {"contents": content}
     try:
         r = requests.post(url, json=payload)
         print("Status Cache:", r.status_code)
@@ -43,16 +45,19 @@ def saveData(id, content):
                 "user_id": id,
                 "contents": {
                     "in_cache": True,
+                    "last_seen": datetime.now().strftime("%d/%m/%Y"),
                 },
             }
             ru = requests.put(update_url, json=up_payload)
-            if(ru.status_code == 200):
+            if ru.status_code == 200:
                 print(f"[{datetime.now().strftime(format)}] Updated clients database")
             else:
-                print(f"[{datetime.now().strftime(format)}] Unable to update clients DB: {ru.status_code}")
+                print(
+                    f"[{datetime.now().strftime(format)}] Unable to update clients DB: {ru.status_code}"
+                )
         else:
             print(f"[{datetime.now().strftime(format)}]Unable to update cache...")
-                
+
     except:
         print(f"[{datetime.now().strftime(format)}] Unable to save data")
 
@@ -62,6 +67,7 @@ def process_client(client):
     products = fetchProducts(user_id)
     if len(products) > 0:
         saveData(user_id, products)
+
 
 def main():
     print(f"[{datetime.now().strftime(format)}] Starting connector...")
