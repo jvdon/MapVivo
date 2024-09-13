@@ -13,6 +13,4 @@
 [Dashboard](https://www.figma.com/design/h6qO5j6AJSipmcj67CjQsw/Dashboard-Vivo?node-id=0-1&t=EAlZxUXFMzlfBhkZ-1 )
 
 ## Mongo Connection String
-mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0 <- Docker
-
-mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019/?replicaSet=rs0 <- Test
+mongodb+srv://jvdon:YvT5T6W1qE4Ta23L@cluster0.ntsx7.mongodb.net/

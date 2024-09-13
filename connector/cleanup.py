@@ -4,7 +4,7 @@ import concurrent.futures
 
 curr = datetime.now().date()
 
-back_url = "http://flask_app:5000"
+back_url = "http://nginx:8080"
 
 format = "%d/%m/%Y"
 

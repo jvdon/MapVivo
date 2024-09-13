@@ -1,17 +1,11 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
+from apscheduler.triggers.cron import CronTrigger
+
 
 import signal
 
 sched = BlockingScheduler()
-
-
-@sched.scheduled_job(trigger=IntervalTrigger(seconds=30))
-def cleanup():
-    import cleanup
-
-    cleanup.main()
-
 
 @sched.scheduled_job(trigger=IntervalTrigger(seconds=30))
 def connect():
@@ -24,8 +18,6 @@ def shutdown_scheduler(signum, frame):
     print("Shutting down scheduler...")
     sched.shutdown()
 
-
-connect()
 
 # Register the signal handler for SIGINT (Ctrl+C)
 signal.signal(signal.SIGINT, shutdown_scheduler)

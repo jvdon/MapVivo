@@ -3,8 +3,10 @@ from faker import Faker
 from datetime import datetime as datetime
 import concurrent.futures
 
-mock_url = "http://localhost:5100/users/%s/products"
-back_url = "http://localhost:5000"
+import cleanup
+
+mock_url = "http://mock:5100/users/%s/products"
+back_url = "http://nginx:8080"
 faker = Faker()
 format = "%d/%m/%Y %H:%M:%S"
 
@@ -41,25 +43,32 @@ def saveData(id, content):
         r = requests.post(url, json=payload)
         print("Status Cache:", r.status_code)
         if r.status_code == 200:
-            up_payload = {
-                "user_id": id,
-                "contents": {
-                    "in_cache": True,
-                    "last_seen": datetime.now().strftime("%d/%m/%Y"),
-                },
-            }
-            ru = requests.put(update_url, json=up_payload)
-            if ru.status_code == 200:
-                print(f"[{datetime.now().strftime(format)}] Updated clients database")
+            print("Cache atualizado")
+            ok = cleanup.deleteClient(id)
+            if ok:
+                print(f"[{datetime.now().strftime(format)}] Cliente {id} Deletado")
             else:
-                print(
-                    f"[{datetime.now().strftime(format)}] Unable to update clients DB: {ru.status_code}"
-                )
+                print(f"[{datetime.now().strftime(format)}] Erro ao deletar cliente {id}")
+
+            # up_payload = {
+            #     "user_id": id,
+            #     "contents": {
+            #         "in_cache": True,
+            #         "last_seen": datetime.now().strftime("%d/%m/%Y"),
+            #     },
+            # }
+            # ru = requests.put(update_url, json=up_payload)
+            # if ru.status_code == 200:
+            #     print(f"[{datetime.now().strftime(format)}] Updated clients database")
+            # else:
+            #     print(
+            #         f"[{datetime.now().strftime(format)}] Unable to update clients DB: {ru.status_code}"
+            #     )
         else:
             print(f"[{datetime.now().strftime(format)}]Unable to update cache...")
 
     except:
-        print(f"[{datetime.now().strftime(format)}] Unable to save data")
+        print(f"[{datetime.now().strftime(format)}] Unable to connect to the backend")
 
 
 def process_client(client):

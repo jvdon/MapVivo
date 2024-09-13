@@ -1,5 +1,3 @@
-include:
-  - ./mongo-compose.yaml
 services:
   #! nginx
   nginx:
@@ -22,16 +20,16 @@ services:
 
   beta_app:
     build: backend/
-    container_name: Alpha
+    container_name: Beta
+    hostname: beta_app
     networks:
       - main
-      - cluster
   alpha_app:
     build: backend/
-    container_name: Beta
+    container_name: Alpha
+    hostname: alpha_app
     networks:
       - main
-      - cluster
 
   connector:
     build: connector/

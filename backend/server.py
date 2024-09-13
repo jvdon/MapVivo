@@ -143,8 +143,9 @@ def fetch(user_id: str):
 @app.post("/cache/save")
 def save():
     contents = request.json["contents"]
+    id = contents["id"]
     with thread_lock:
-        index, ok = cache.save(contents)
+        index, ok = cache.save(id, contents)
 
     return (
         jsonify(

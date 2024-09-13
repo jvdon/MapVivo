@@ -9,8 +9,8 @@ import json
 from conf import mongodb_uri
 
 
-
 cache_lock = threading.Lock()
+
 
 def open_cache() -> Collection:
     with cache_lock:
@@ -72,15 +72,16 @@ def get(cliente):
 # Write
 
 
-def save(content):
+def save(id, content):
     cache = open_cache()
     with cache_lock:
         if cache is None:
             return False
         try:
-            res = cache.insert_one(content)
+            res = cache.replace_one({"id": id}, content, upsert=True)
+            # res = cache.insert_one(content)
 
-            return res.inserted_id, True
+            return res.upserted_id, True
         except Exception as e:
             print(f"Error saving entry: {e}")
             return e, False
