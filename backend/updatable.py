@@ -72,7 +72,7 @@ def get(cliente: str):
 # Write
 
 
-def save(content):
+def add(content):
     updatable = open_db()
     if updatable is None:
         return False

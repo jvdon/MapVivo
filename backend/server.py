@@ -192,7 +192,7 @@ def clientes_add():
     last_seen = datetime.now()
 
     with thread_lock:
-        ok = updatable.save(
+        ok = updatable.add(
             {
                 "user_id": user_id,
                 "in_cache": in_cache,

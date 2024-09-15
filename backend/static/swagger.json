@@ -1,181 +1,108 @@
 {
-  "openapi": "3.0.0",
+  "swagger": "2.0",
   "info": {
-    "title": "Flask API",
     "version": "1.0.0",
-    "description": "API documentation for the Flask application"
+    "title": "MapiVIVO"
   },
+  "basePath": "/",
   "paths": {
     "/dns/all": {
       "get": {
-        "summary": "Get all DNS records",
+        "summary": "Get all DNS entries",
         "responses": {
           "200": {
-            "description": "Successful response with DNS records",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
+            "description": "A list of DNS entries"
           },
           "404": {
-            "description": "No DNS records found"
+            "description": "No entries found"
           }
         }
       }
     },
     "/dns/search/{produto}": {
       "get": {
-        "summary": "Search DNS record by product name",
+        "summary": "Search for a DNS entry",
         "parameters": [
           {
             "name": "produto",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "type": "string",
+            "description": "Product to search"
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful response with DNS record",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean"
-                    },
-                    "content": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Entry found"
           },
           "404": {
-            "description": "DNS record not found"
+            "description": "Entry not found"
           }
         }
       }
     },
     "/dns/add": {
       "post": {
-        "summary": "Add a new DNS record",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "address": {
-                    "type": "string"
-                  }
+        "summary": "Add a DNS entry",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
                 },
-                "required": [
-                  "name",
-                  "address"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "DNS record added successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
+                "address": {
+                  "type": "string"
                 }
               }
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "DNS entry added"
           },
           "404": {
-            "description": "Failed to add DNS record"
+            "description": "Failed to add DNS entry"
           }
         }
       }
     },
     "/dns/delete": {
       "delete": {
-        "summary": "Delete a DNS record",
+        "summary": "Delete a DNS entry",
         "parameters": [
           {
             "name": "id",
             "in": "query",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "type": "string",
+            "description": "ID of the DNS entry"
           }
         ],
         "responses": {
           "200": {
-            "description": "DNS record deleted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "DNS entry deleted"
           },
           "404": {
-            "description": "Failed to delete DNS record"
+            "description": "Failed to delete DNS entry"
           }
         }
       }
     },
     "/dns/names": {
       "get": {
-        "summary": "Get all DNS names",
+        "summary": "Get all product names",
         "responses": {
           "200": {
-            "description": "Successful response with DNS names",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean"
-                    },
-                    "content": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            "description": "A list of product names"
           },
           "404": {
-            "description": "No DNS names found"
+            "description": "No product names found"
           }
         }
       }
@@ -185,108 +112,60 @@
         "summary": "Get all cache entries",
         "responses": {
           "200": {
-            "description": "Successful response with cache entries",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
+            "description": "Cache entries found"
           },
           "404": {
-            "description": "No cache entries found"
+            "description": "No cache entries"
           }
         }
       }
     },
-    "/cache/fetch/{produto}/{cliente}": {
+    "/users/{user_id}/products": {
       "get": {
-        "summary": "Fetch cache entry by product and client",
+        "summary": "Get products for a user",
         "parameters": [
           {
-            "name": "produto",
+            "name": "user_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "cliente",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "type": "string",
+            "description": "User ID"
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful response with cache entry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
+            "description": "User's products found"
           },
           "500": {
-            "description": "Error occurred while fetching cache entry"
+            "description": "Error fetching products"
           }
         }
       }
     },
     "/cache/save": {
       "post": {
-        "summary": "Save a cache entry",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cliente": {
-                    "type": "string"
-                  },
-                  "contents": {
-                    "type": "object"
-                  }
-                },
-                "required": [
-                  "cliente",
-                  "contents"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Cache entry saved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
+        "summary": "Save contents to cache",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "contents": {
+                  "type": "object"
                 }
               }
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contents saved to cache"
           },
           "500": {
-            "description": "Failed to save cache entry"
+            "description": "Failed to save to cache"
           }
         }
       }
@@ -299,21 +178,13 @@
             "name": "user_id",
             "in": "query",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "type": "string",
+            "description": "User ID"
           }
         ],
         "responses": {
           "200": {
-            "description": "Cache entry deleted successfully",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": "Cache entry deleted"
           },
           "400": {
             "description": "Failed to delete cache entry"
@@ -321,30 +192,12 @@
         }
       }
     },
-    "/client/all": {
+    "/updatable/all": {
       "get": {
-        "summary": "Get all clients",
+        "summary": "Get all updatable clients",
         "responses": {
           "200": {
-            "description": "Successful response with clients",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean"
-                    },
-                    "contents": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Clients retrieved"
           },
           "404": {
             "description": "No clients found"
@@ -352,45 +205,27 @@
         }
       }
     },
-    "/client/add": {
+    "/updatable/add": {
       "post": {
-        "summary": "Add a new client",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "user_id": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "user_id"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Client added successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
+        "summary": "Add a new updatable client",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string"
                 }
               }
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client added"
           },
           "400": {
             "description": "Failed to add client"
@@ -398,29 +233,21 @@
         }
       }
     },
-    "/client/delete": {
+    "/updatable/delete": {
       "delete": {
-        "summary": "Delete a client",
+        "summary": "Delete an updatable client",
         "parameters": [
           {
             "name": "user_id",
             "in": "query",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "type": "string",
+            "description": "User ID"
           }
         ],
         "responses": {
           "200": {
-            "description": "Client deleted successfully",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": "Client deleted"
           },
           "400": {
             "description": "Failed to delete client"
@@ -428,41 +255,30 @@
         }
       }
     },
-    "/client/update": {
+    "/updatable/update": {
       "put": {
-        "summary": "Update a client",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "user_id": {
-                    "type": "string"
-                  },
-                  "contents": {
-                    "type": "object"
-                  }
-                },
-                "required": [
-                  "user_id",
-                  "contents"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Client updated successfully",
-            "content": {
-              "text/plain": {
-                "schema": {
+        "summary": "Update an updatable client",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
                   "type": "string"
+                },
+                "contents": {
+                  "type": "object"
                 }
               }
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client updated"
           },
           "400": {
             "description": "Failed to update client"
@@ -470,37 +286,21 @@
         }
       }
     },
-    "/client/search": {
+    "/updatable/search": {
       "get": {
-        "summary": "Search for a client by user ID",
+        "summary": "Search for an updatable client",
         "parameters": [
           {
             "name": "user_id",
             "in": "query",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "type": "string",
+            "description": "User ID"
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful response with client data",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Client found"
           },
           "404": {
             "description": "Client not found"
@@ -516,60 +316,26 @@
             "name": "server",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "type": "string",
+            "description": "Server to ping"
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful ping response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "server": {
-                      "type": "string"
-                    },
-                    "time": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Ping successful"
           },
           "500": {
-            "description": "Error occurred during ping"
+            "description": "Failed to ping"
           }
         }
       }
     },
     "/api/usage": {
       "get": {
-        "summary": "Get system usage statistics",
+        "summary": "Check system usage",
         "responses": {
           "200": {
-            "description": "Successful response with system usage",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "boolean"
-                    },
-                    "ram": {
-                      "type": "number"
-                    },
-                    "storage": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Usage details retrieved"
           }
         }
       }
