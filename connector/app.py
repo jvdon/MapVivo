@@ -5,9 +5,11 @@ from apscheduler.triggers.cron import CronTrigger
 
 import signal
 
+print("Connector started...")
+
 sched = BlockingScheduler()
 
-@sched.scheduled_job(trigger=IntervalTrigger(seconds=30))
+@sched.scheduled_job(trigger=IntervalTrigger(minutes=1))
 def connect():
     import populate
 

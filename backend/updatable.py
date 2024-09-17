@@ -27,17 +27,17 @@ def open_db() -> Collection:
             )  # This will raise an exception if unable to connect
             print("[UPDATABLE] Connected to MongoDB cluster.")
 
-            # Access the 'test' database
             db = client.MapVIVO
             return db.get_collection("updatable")
         except ConnectionError as e:
             print(f"[UPDATABLE] Error connecting to MongoDB: {e}")
             return None
 
+updatable = open_db()
 
 # Read All
 def getAll():
-    updatable = open_db()
+    # updatable = open_db()
     if updatable is None:
         return [], False
     try:
@@ -52,7 +52,7 @@ def getAll():
 
 # Read
 def get(cliente: str):
-    updatable = open_db()
+    # updatable = open_db()
     if updatable is None:
         return [], False
     try:
@@ -73,11 +73,11 @@ def get(cliente: str):
 
 
 def add(content):
-    updatable = open_db()
+    # updatable = open_db()
     if updatable is None:
         return False
     try:
-        updatable.insert_one(content)
+        updatable.replace_one(content, content, upsert=True)
         return True
     except:
         return False
@@ -87,7 +87,7 @@ def add(content):
 
 
 def update(user_id: str, content):
-    updatable = open_db()
+    # updatable = open_db()
     if updatable is None:
         return False
     try:
@@ -100,7 +100,7 @@ def update(user_id: str, content):
 
 # Delete
 def delete(user_id):
-    updatable = open_db()
+    # updatable = open_db()
     if updatable is None:
         return False
     try:

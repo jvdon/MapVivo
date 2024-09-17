@@ -31,15 +31,17 @@ def open_cache() -> Collection:
             print(f"[CACHE] Error connecting to MongoDB: {e}")
             return None
 
+cache = open_cache()
+
 
 # Check cache access
 def checkCache():
-    return open_cache("./cache/vivo") != None
+    return open_cache() != None
 
 
 # Read All
 def getAll():
-    cache = open_cache()
+    # cache = open_cache()
     if cache is None:
         return [], False
     try:
@@ -54,7 +56,7 @@ def getAll():
 
 # Read
 def get(cliente):
-    cache = open_cache()
+    # cache = open_cache()
     if cache is None:
         return [], False
     try:
@@ -73,15 +75,14 @@ def get(cliente):
 
 
 def save(id, content):
-    cache = open_cache()
+    # cache = open_cache()
     with cache_lock:
         if cache is None:
             return False
         try:
             res = cache.replace_one({"id": id}, content, upsert=True)
             # res = cache.insert_one(content)
-
-            return res.upserted_id, True
+            return res.upserted_id , True
         except Exception as e:
             print(f"Error saving entry: {e}")
             return e, False
@@ -91,7 +92,7 @@ def save(id, content):
 
 
 def update(cliente, content):
-    cache = open_cache()
+    # cache = open_cache()
     try:
         res = cache.update_one({"id": cliente}, content, upsert=True)
         return res.acknowledged
@@ -101,7 +102,7 @@ def update(cliente, content):
 
 # Delete
 def delete(cliente):
-    cache = open_cache()
+    # cache = open_cache()
     res = cache.delete_one(filter={"id": cliente})
     return res.acknowledged
 
