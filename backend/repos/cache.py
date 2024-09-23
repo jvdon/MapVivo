@@ -105,7 +105,3 @@ def delete(cliente):
     # cache = open_cache()
     res = cache.delete_one(filter={"id": cliente})
     return res.acknowledged
-
-
-def usage():
-    return -1

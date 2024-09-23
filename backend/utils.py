@@ -1,20 +1,15 @@
 import ping3
 import psutil
-import vivo_dns as dns
-import cache
-
-
-def getUsage():
-    try:
-        size = cache.usage() + dns.usage()
-        return size, True
-    except:
-        return -1, False
 
 
 def getRAM():
-    ram = psutil.virtual_memory()
-    return ram.used / (1024**2), True
+    ramfd = psutil.virtual_memory()
+    info = {
+        "used": ramfd.used / (1024**2),
+        "total": ramfd.total / (1024**2),
+    }
+
+    return info, True
 
 
 def ping(server):
@@ -25,4 +20,4 @@ def ping(server):
         else:
             return 1000, False
     except Exception as e:
-        return f"Error: {e}", False
+        return -1, False

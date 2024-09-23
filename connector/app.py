@@ -1,15 +1,22 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.triggers.cron import CronTrigger
-
-
+from datetime import datetime, timedelta
 import signal
 
-print("Connector started...")
+from config import interval, format
+
+now = datetime.now()
+now_plus_x = now + timedelta(seconds=interval)
+
+print(
+    f"[{datetime.now().strftime(format)}] Connector Started! First run: {now_plus_x.strftime(format)}"
+)
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job(trigger=IntervalTrigger(minutes=1))
+
+@sched.scheduled_job(trigger=IntervalTrigger(seconds=interval))
 def connect():
     import populate
 

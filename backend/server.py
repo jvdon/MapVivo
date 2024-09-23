@@ -6,20 +6,22 @@ from flask import (
 )
 from flask_swagger_ui import get_swaggerui_blueprint
 import atexit
-
+import flask_cors
 from datetime import datetime
 
-# importa bibliotecas do cassandra
 
 # Project
-import cache
-import vivo_dns
+import repos.cache as cache
+import repos.vivo_dns as vivo_dns
 import utils
-import updatable
+import repos.updatable as updatable
+import repos.dashboard as dashboard
 
 import threading
 
 app = Flask(__name__)
+
+cors = flask_cors.CORS(app)
 
 SWAGGER_URL = "/swagger"
 API_URL = "/static/swagger.json"
@@ -71,10 +73,16 @@ def dns_search(produto: str):
 def dns_add():
     name = str(request.json["name"]).upper()
     address = str(request.json["address"]).lower()
+    status = vivo_dns.add(
+        {
+            "name": name,
+            "address": address,
+        }
+    )
 
-    result, status = vivo_dns.add(name, address)
-
-    return jsonify({"message": result}), 200 if status == True else 404
+    return jsonify(
+        {"message": "DNS Added" if status else "Failed to add dns", "ok": status}
+    ), (200 if status == True else 404)
 
 
 @app.delete("/dns/delete")
@@ -122,18 +130,17 @@ def fetch(user_id: str):
         cliente, status = cache.get(
             cliente=user_id.upper(),
         )
-    print(cliente)
-    if status == True:
+    if status == True and len(cliente) > 0:
         return jsonify(cliente), 200
     else:
         return (
             jsonify(
                 {
                     "status": "Error",
-                    "message": f"Oops something went wrong",
+                    "message": f"Unable to fetch entry with id {user_id}",
                 }
             ),
-            500,
+            404,
         )
 
 
@@ -174,7 +181,9 @@ def delete_cache():
 # END REGION
 
 
-# REGION Clientes
+# REGION Updatable
+
+
 @app.get("/updatable/all")
 def clientes_all():
     with thread_lock:
@@ -188,15 +197,16 @@ def clientes_all():
 @app.post("/updatable/add")
 def clientes_add():
     user_id = str(request.json["user_id"])
+    shards = list(request.json["shards"])
     in_cache = False
-    last_seen = datetime.now()
 
     with thread_lock:
         ok = updatable.add(
             {
                 "user_id": user_id,
                 "in_cache": in_cache,
-                "last_seen": last_seen.strftime("%d/%m/%Y"),
+                "last_seen": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                "shards": shards,
             },
         )
 
@@ -204,7 +214,7 @@ def clientes_add():
         {
             "ok": ok,
             "message": (
-                "Cliente adicionado" if ok else "Não foi possível adicionar o cliente"
+                "user_id adicionado" if ok else "Não foi possível adicionar o user_id"
             ),
         }
     ), (200 if ok else 400)
@@ -243,7 +253,7 @@ def client_search():
 
 
 # REGION DASHBOARD (API)
-@app.get("/api/ping/<server>")
+@app.get("/dashboard/ping/<server>")
 def ping(server: str):
     with thread_lock:
         respTime, ok = utils.ping(server)
@@ -262,24 +272,97 @@ def ping(server: str):
     return response
 
 
-@app.get("/api/usage")
+
+@app.get("/dashboard/usage")
 def checkUsage():
     with thread_lock:
-        size, statusStorage = utils.getUsage()
         ram, statusRam = utils.getRAM()
 
     response = jsonify(
         {
-            "status": (statusRam and statusStorage),
+            "status": (statusRam),
             "ram": ram if statusRam else -1,
-            "storage": size if statusStorage else -1,
         }
     )
 
     return response, 200
 
 
+@app.get("/dashboard/connector/users_cache")
+def usersInCache():
+    with thread_lock:
+        in_cache, status = updatable.inCache()
+        total, status_all = updatable.getAll()
+
+    if status and status_all:
+        return jsonify(
+            {
+                "in_cache": len(in_cache),
+                "total": len(total),
+            }
+        ), 200
+    else:
+        return jsonify({
+            "status": "FAIL",
+            "message": "Unable to fetch data"
+        })
+    
+@app.get("/dashboard/connector/last")
+def connectorLastRun():
+    run, status = dashboard.last()
+    if(status == True and len(run) > 0):
+        return jsonify(run[0]), 200
+    else:
+        return jsonify({
+            "status": "FAIL",
+            "message": "Unable to fetch last run"
+        }), 500
+
+@app.get("/dashboard/connector/runs")
+def connectorRuns():
+    with thread_lock:
+        runs_total, ok = dashboard.getAll()
+        runs_ok, ok_ok = dashboard.successful()
+
+    return {
+        "ok": ok and ok_ok,
+        "stats": {
+            "total": len(runs_total),
+            "successful": len(runs_ok) if len(runs_total) >= 0 else -1
+        },
+    }, (200 if ok else 404)
+
+
+@app.post("/dashboard/connector/run")
+def connectorAddRun():
+    last_run = request.json["last_run"]
+    next_run = request.json["next_run"]
+    ok = request.json["ok"]
+
+    run = {
+        "last_run": last_run,
+        "next_run": next_run,
+        "ok": ok,
+    }
+
+    ok = dashboard.add(run)
+    
+    return jsonify({
+        "ok": ok,
+        "message": "Run added successfully" if ok else "Unable to add run"
+    }), 200 if ok else 500
+
+
+@app.get("/dashboard/connector/all")
+def runs_all():
+    with thread_lock:
+        clients, ok = updatable.getAll()
+    return {
+        "ok": ok,
+        "contents": clients,
+    }, (200 if ok else 404)
+
 # END REGION
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, threaded=True)
+    app.run(host="0.0.0.0", port=5000, threaded=True, debug=False)

@@ -95,6 +95,113 @@ def timeout(e):
         504,
     )
 
+# Mock data for Vivo Fibra
+@app.route('/fibra/planos', methods=['GET'])
+def get_fibra_planos():
+    planos = [
+        {
+            "id": str(i),
+            "nome": faker.word() + " Fibra",
+            "velocidade_download": f"{faker.random_number(digits=3)} Mbps",
+            "velocidade_upload": f"{faker.random_number(digits=2)} Mbps",
+            "preco": f"R$ {faker.random_number(digits=2)},99",
+            "descricao": faker.sentence()
+        }
+        for i in range(1, 3)
+    ]
+    return jsonify({"planos": planos})
+
+@app.route('/fibra/planos/<id>', methods=['GET'])
+def get_fibra_plano(id):
+    plano = {
+        "id": id,
+        "nome": faker.word() + " Fibra",
+        "velocidade_download": f"{faker.random_number(digits=3)} Mbps",
+        "velocidade_upload": f"{faker.random_number(digits=2)} Mbps",
+        "preco": f"R$ {faker.random_number(digits=2)},99",
+        "descricao": faker.sentence()
+    }
+    return jsonify(plano)
+
+# Mock data for Vivo Móvel
+@app.route('/movel/planos', methods=['GET'])
+def get_movel_planos():
+    planos = [
+        {
+            "id": str(i),
+            "nome": faker.word() + " Controle",
+            "dados": f"{faker.random_number(digits=1)} GB",
+            "chamadas": "Ilimitadas",
+            "preco": f"R$ {faker.random_number(digits=2)},99",
+            "descricao": faker.sentence()
+        }
+        for i in range(1, 3)
+    ]
+    return jsonify({"planos": planos})
+
+@app.route('/movel/planos/<id>', methods=['GET'])
+def get_movel_plano(id):
+    plano = {
+        "id": id,
+        "nome": faker.word() + " Controle",
+        "dados": f"{faker.random_number(digits=1)} GB",
+        "chamadas": "Ilimitadas",
+        "preco": f"R$ {faker.random_number(digits=2)},99",
+        "descricao": faker.sentence()
+    }
+    return jsonify(plano)
+
+# Mock data for Vivo Televisão
+@app.route('/televisao/pacotes', methods=['GET'])
+def get_televisao_pacotes():
+    pacotes = [
+        {
+            "id": str(i),
+            "nome": faker.word() + " TV Básica",
+            "canais": f"{faker.random_number(digits=2)} canais",
+            "preco": f"R$ {faker.random_number(digits=2)},99",
+            "descricao": faker.sentence()
+        }
+        for i in range(1, 3)
+    ]
+    return jsonify({"pacotes": pacotes})
+
+@app.route('/televisao/pacotes/<id>', methods=['GET'])
+def get_televisao_pacote(id):
+    pacote = {
+        "id": id,
+        "nome": faker.word() + " TV Básica",
+        "canais": f"{faker.random_number(digits=2)} canais",
+        "preco": f"R$ {faker.random_number(digits=2)},99",
+        "descricao": faker.sentence()
+    }
+    return jsonify(pacote)
+
+# Mock data for Vivo Fixo
+@app.route('/fixo/planos', methods=['GET'])
+def get_fixo_planos():
+    planos = [
+        {
+            "id": str(i),
+            "nome": faker.word() + " Fixo Básico",
+            "minutos": f"{faker.random_number(digits=3)} minutos",
+            "preco": f"R$ {faker.random_number(digits=2)},99",
+            "descricao": faker.sentence()
+        }
+        for i in range(1, 3)
+    ]
+    return jsonify({"planos": planos})
+
+@app.route('/fixo/planos/<id>', methods=['GET'])
+def get_fixo_plano(id):
+    plano = {
+        "id": id,
+        "nome": faker.word() + " Fixo Básico",
+        "minutos": f"{faker.random_number(digits=3)} minutos",
+        "preco": f"R$ {faker.random_number(digits=2)},99",
+        "descricao": faker.sentence()
+    }
+    return jsonify(plano)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=5100)

@@ -4,8 +4,11 @@ from bson import json_util
 import json
 import threading
 from conf import mongodb_uri
+import utils
+from datetime import datetime
 
-"""obj = {
+"""
+obj = {
     user_id: number,
     in_cache: bool,
     last_seen: date
@@ -25,15 +28,17 @@ def open_db() -> Collection:
             server_info = (
                 client.server_info()
             )  # This will raise an exception if unable to connect
-            print("[UPDATABLE] Connected to MongoDB cluster.")
+            print("[DNS] Connected to MongoDB cluster.")
 
             db = client.MapVIVO
-            return db.get_collection("updatable")
+            return db.get_collection("DNS")
         except ConnectionError as e:
-            print(f"[UPDATABLE] Error connecting to MongoDB: {e}")
+            print(f"[DNS] Error connecting to MongoDB: {e}")
             return None
 
+
 updatable = open_db()
+
 
 # Read All
 def getAll():
@@ -51,7 +56,7 @@ def getAll():
 
 
 # Read
-def get(cliente: str):
+def get(name: str):
     # updatable = open_db()
     if updatable is None:
         return [], False
@@ -59,7 +64,7 @@ def get(cliente: str):
         return (
             json.loads(
                 json_util.dumps(
-                    [document for document in updatable.find({"user_id": cliente})]
+                    [document for document in updatable.find({"name": name})]
                 )
             ),
             True,
@@ -77,7 +82,14 @@ def add(content):
     if updatable is None:
         return False
     try:
-        updatable.replace_one(content, content, upsert=True)
+        ping, ok = utils.ping(content["address"])
+        dns = {
+            "name": content["name"],
+            "address": content["address"],
+            "ping": ping,
+            "checked_on": datetime.now().strftime("%d/%m/%Y"),
+        }
+        updatable.replace_one({"name": content["name"]}, dns, upsert=True)
         return True
     except:
         return False
@@ -86,12 +98,12 @@ def add(content):
 # Update
 
 
-def update(user_id: str, content):
+def update(name: str, content):
     # updatable = open_db()
     if updatable is None:
         return False
     try:
-        updatable.replace_one({"user_id": user_id}, content)
+        updatable.replace_one({"name": name}, content)
         return True
     except Exception as e:
         print(e)
@@ -99,16 +111,12 @@ def update(user_id: str, content):
 
 
 # Delete
-def delete(user_id):
+def delete(name):
     # updatable = open_db()
     if updatable is None:
         return False
     try:
-        updatable.delete_one(filter={"user_id": user_id})
+        updatable.delete_one(filter={"name": name})
         return True
     except:
         return False
-
-
-def usage():
-    return -1
