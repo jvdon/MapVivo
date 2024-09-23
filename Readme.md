@@ -13,4 +13,4 @@
 [Dashboard](https://www.figma.com/design/h6qO5j6AJSipmcj67CjQsw/Dashboard-Vivo?node-id=0-1&t=EAlZxUXFMzlfBhkZ-1 )
 
 ## Mongo Connection String
-mongodb+srv://jvdon:YvT5T6W1qE4Ta23L@cluster0.ntsx7.mongodb.net/
+mongodb+srv://user:pass@cluster0.ntsx7.mongodb.net/
